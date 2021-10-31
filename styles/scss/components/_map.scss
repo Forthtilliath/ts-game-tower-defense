@@ -1,0 +1,22 @@
+:root {
+    --nbRows: 5;
+    --nbColumns: 5;
+    --tile-size: 30px;
+}
+
+.map {
+    display: grid;
+    grid-auto-flow: row dense;
+    grid-template-rows: repeat(
+        var(--nbRows),
+        var(--tile-size)
+    );
+    grid-template-columns: repeat(
+        var(--nbColumns),
+        var(--tile-size)
+    );
+    gap: $mapGap;
+    background-color: #e3bb70;
+
+    position: relative;
+}

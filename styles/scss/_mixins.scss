@@ -1,0 +1,26 @@
+@mixin center($justify-content: flex-start) {
+    display: flex;
+    align-items: center;
+    justify-content: $justify-content;
+}
+
+@mixin circle($width) {
+    width: $width * 1px;
+    height: $width * 1px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+@mixin scroll-divFix($top) {
+    max-width: 360px;
+    overflow-y: scroll;
+    height: calc(100vh - #{$top});
+    position: sticky;
+    top: $top;
+}
+
+@mixin sprite($x,$y) {
+    background: url(../../../images/tileset.png) 0 0 no-repeat;
+    background-size: 800% 600%;
+    background-position: calc(#{$x} / 14 * 100%) calc(#{$y} / 10 * 100%);
+}

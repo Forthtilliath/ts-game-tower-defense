@@ -1,0 +1,17 @@
+{
+  "name": "ts-game-tower-defense",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Forth",
+  "license": "MIT",
+  "scripts": {
+    "build-ts": "tsc --build tsconfig.json --watch --preserveWatchOutput",
+    "build-sass": "sass --no-source-map --watch styles/scss/index.scss:styles/css/style.css",
+    "build": "concurrently -k -n \"Typescript,SASS\" -p \"[{name}]\" -c \"blue,green\" \"yarn run build-ts\" \"yarn run build-sass\""
+  },
+  "dependencies": {
+    "concurrently": "*",
+    "sass": "*",
+    "typescript": "*"
+  }
+}
