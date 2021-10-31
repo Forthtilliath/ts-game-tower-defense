@@ -5,12 +5,12 @@ const TYPE_END = 3;
 const TYPE_CONSTRUCTIBLE = 4;
 const TYPE_TURRET = 5;
 const arrTypeClasses = {
-    0: 'decor',
-    1: 'start',
-    2: 'route',
-    3: 'end',
-    4: 'constructible',
-    5: 'turret',
+    [TYPE_DECOR]: 'decor',
+    [TYPE_START]: 'start',
+    [TYPE_ROUTE]: 'route',
+    [TYPE_END]: 'end',
+    [TYPE_CONSTRUCTIBLE]: 'constructible',
+    [TYPE_TURRET]: 'turret',
 };
 export default class Tile {
     constructor({ type, index }) {

@@ -9,12 +9,12 @@ const TYPE_TURRET: number = 5;
  * Tableau contenant les classes à ajouter en fonction du type
  */
 const arrTypeClasses: ObjectType = {
-    0: 'decor',
-    1: 'start',
-    2: 'route',
-    3: 'end',
-    4: 'constructible',
-    5: 'turret',
+    [TYPE_DECOR]: 'decor',
+    [TYPE_START]: 'start',
+    [TYPE_ROUTE]: 'route',
+    [TYPE_END]: 'end',
+    [TYPE_CONSTRUCTIBLE]: 'constructible',
+    [TYPE_TURRET]: 'turret',
 };
 
 export default class Tile {

@@ -28,6 +28,7 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background-color: #2d2d2d;
 }
 
 a {
@@ -109,8 +110,7 @@ header .primary .link:hover {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background-color: var(--color-2);
-  background-image: linear-gradient(180deg, var(--color-2) 0%, var(--color-4) 40%);
+  color: #f2f2f2;
 }
 .footer .footer_content {
   width: 100%;
@@ -205,4 +205,44 @@ header .primary .link:hover {
   width: 30px;
   height: 30px;
   background-color: hotpink;
+}
+
+.player {
+  position: fixed;
+  inset: 5px;
+  display: flex;
+  gap: 15px;
+  height: 20px;
+  width: 300px;
+}
+.player__item {
+  display: flex;
+  align-items: center;
+}
+.player__item img {
+  width: 20px;
+  margin-right: 5px;
+}
+.player__item span {
+  color: #f2f2f2;
+  font-size: 1.1rem;
+}
+
+.wave {
+  position: fixed;
+  inset: 5px;
+  left: auto;
+  height: 20px;
+}
+.wave__item {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #f2f2f2;
+}
+.wave__item > span {
+  margin-left: 5px;
+  font-weight: 400;
 }

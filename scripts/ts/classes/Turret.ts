@@ -21,35 +21,23 @@ export default class Turret {
     element: HTMLDivElement;
 
     constructor(x: number, y: number, range: number, speed: number, bulletSpeed: number, bulletDamages: number) {
-        /**
-         * Gère les coordonnées de la tourelle en brut pour le moment. A générere selon la case sélectionner à terme
-         */
+        /** Gère les coordonnées de la tourelle en brut pour le moment. A générere selon la case sélectionner à terme */
         this.x = x; // pixels
         this.y = y; // pixels
 
-        /**
-         * Portée de la tourelle
-         */
+        /** Portée de la tourelle */
         this.range = range; // pixels
 
-        /**
-         * Vitesse de tir de la tourelle
-         */
+        /** Vitesse de tir de la tourelle */
         this.speed = speed; // seconds
 
         // Caractéristiques du projectile tiré par la tourelle
-        /**
-         * Vitesse du projectile
-         */
+        /** Vitesse du projectile */
         this.bulletSpeed = bulletSpeed; // pixels
-        /**
-         * Dégats du projectile
-         */
+        /** Dégats du projectile */
         this.bulletDamages = bulletDamages;
 
-        /**
-         * Element du DOM lié à la tourelle
-         */
+        /** Element du DOM lié à la tourelle */
         this.element = this.createTurret();
     }
 

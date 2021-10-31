@@ -6,11 +6,12 @@ const TYPE_ELITE: number = 2;
 const TYPE_BOSS: number = 3;
 
 const TypeMonster: ObjectType = {
-    0: 'Commom',
-    1: 'Rare',
-    2: 'Elite',
-    3: 'Boss',
+    [TYPE_COMMON]: 'Common',
+    [TYPE_RARE]: 'Rare',
+    [TYPE_ELITE]: 'Elite',
+    [TYPE_BOSS]: 'Boss',
 };
+console.log(TypeMonster[0]);
 
 /**
  * La classe Monstre gère le monstre en lui-même.

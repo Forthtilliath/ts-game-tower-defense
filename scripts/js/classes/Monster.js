@@ -3,11 +3,12 @@ const TYPE_RARE = 1;
 const TYPE_ELITE = 2;
 const TYPE_BOSS = 3;
 const TypeMonster = {
-    0: 'Commom',
-    1: 'Rare',
-    2: 'Elite',
-    3: 'Boss',
+    [TYPE_COMMON]: 'Common',
+    [TYPE_RARE]: 'Rare',
+    [TYPE_ELITE]: 'Elite',
+    [TYPE_BOSS]: 'Boss',
 };
+console.log(TypeMonster[0]);
 export default class Monster {
     constructor({ id, name, life, movement, damages, flying, gold, type }) {
         this.id = id;

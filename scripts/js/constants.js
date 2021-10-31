@@ -1,5 +1,5 @@
 export default Object.freeze({
-    TILE_DEFAULT_SIZE: '150px',
+    TILE_DEFAULT_SIZE: '50px',
     WAVE_DELAI: 5,
-    MONSTER_DELAI: .5,
+    MONSTER_DELAI: 0.5,
 });

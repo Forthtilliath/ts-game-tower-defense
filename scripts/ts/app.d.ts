@@ -1,6 +1,6 @@
-interface Object {
-    [key: string]: any;
-}
+// interface Object {
+//     [key: string]: any;
+// }
 interface ObjectType {
     readonly [key: number]: string;
 }
