@@ -36,6 +36,8 @@ export default class Game {
         this._isPlaying ? this.play() : this.stop();
     }
 
+    // METHODES
+
     /** Instancie une Game et charge le json */
     public static CreateAsync = async () => {
         const theGame = new Game();
@@ -61,6 +63,8 @@ export default class Game {
 
         this._currentMap.generateDom();
     }
+
+    // ANIMATIONS
 
     private play() {
         this._currentMap!.nextWave();

@@ -12,6 +12,7 @@ GameInitialized.then((myGame) => {
     btn_startWave.addEventListener('click', () => handleGame(myGame));
 });
 
+/** Event du bouton de l'état du jeu */
 function handleGame(theGame: Game) {
     theGame.setPlaying();
     btn_startWave.textContent = theGame.isPlaying ? 'Pause' : 'Lecture';

@@ -1,8 +1,5 @@
-/**
- * Retourne un élément HTML à partir du sélecteur
- * @returns {HTMLElement}
- */
-export const $ = (selector: string) => document.querySelector(selector);
+/** Retourne un élément HTML à partir du sélecteur */
+export const $ = (selector: string) => document.querySelector(selector) as HTMLElement;
 
 /**
  * Compare 2 tableaux pour savoir s'ils sont identiques.
@@ -10,48 +7,31 @@ export const $ = (selector: string) => document.querySelector(selector);
  */
 export const compareArrays = (array1: any[], array2: any[]) => JSON.stringify(array1) === JSON.stringify(array2);
 
-/**
- * Ajoute des éléments dans le DOM
- */
+/** Ajoute des éléments dans le DOM */
 export const appendChilds = (parent: HTMLElement, elements: HTMLElement[]) =>
     elements.forEach((element) => parent.appendChild(element));
 
-/**
- * Charge un fichier JSON à partir d'une url
- */
+/** Charge un fichier JSON à partir d'une url */
 export const loadJson = async (url: string) => {
     try {
-        const res = await fetch(url); // Fetch du JSON
-        return await res.json(); // Returne des données en JSON
+        return await fetch(url).then(res => res.json());
     } catch (err) {
         console.error(err); // Log les erreurs dans la console
     }
 }; 
 
-/**
- * Fusionne un tableau à 2 dimensions pour retourner un tableau à une dimension
- */
+/** Fusionne un tableau à 2 dimensions pour retourner un tableau à une dimension */
 export const mergeArrays = (arr: any[][]) => arr.reduce((accArr, currArr) => accArr.concat(...currArr), []);
 
-/**
- * Récupère un élément parmi un tableau à partir de son id
- */
+/** Récupère un élément parmi un tableau à partir de son id */
 export const getContentById = (id: number, arrayOfContents: any[]): any =>
     arrayOfContents.find((content) => content.id === id) ?? [];
 
-/**
- * Récupère des éléments parmi un tableau à partir de leur id
- */
+/** Récupère des éléments parmi un tableau à partir de leur id */
 export const getContentByIds = (array: number[], arrayOfContents: any[]): any[] =>
     array.flatMap((id: number): Object => getContentById(id, arrayOfContents));
 
-// export const getContentByObjectsWithId = (arrayOfObjects, arrayOfContents, propertyName) =>
-//     arrayOfObjects.map((object) => getContentById(object[propertyName], arrayOfContents));
-
-/**
- * Calcul des distances entre projectile et cible
- * @returns {object} distance de la cible en x et en y et distance total de trajet
- */
+/** Calcul des distances entre projectile et cible */
 export const trajCalculation = (
     bulletX: number,
     bulletY: number,
@@ -69,10 +49,7 @@ export const trajCalculation = (
     return { x, y, travelDistance };
 };
 
-/**
- * Calcul de la distance en ligne droite entre 2 points
- * @returns {number} distance de trajet entre les deux points
- */
+/** Calcul de la distance en ligne droite entre 2 points */
 export const distCalculation = (deltaX: number, deltaY: number): number => Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
 export default {

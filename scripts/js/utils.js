@@ -3,8 +3,7 @@ export const compareArrays = (array1, array2) => JSON.stringify(array1) === JSON
 export const appendChilds = (parent, elements) => elements.forEach((element) => parent.appendChild(element));
 export const loadJson = async (url) => {
     try {
-        const res = await fetch(url);
-        return await res.json();
+        return await fetch(url).then(res => res.json());
     }
     catch (err) {
         console.error(err);
