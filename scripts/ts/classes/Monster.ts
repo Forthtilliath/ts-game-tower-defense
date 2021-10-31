@@ -11,7 +11,6 @@ const TypeMonster: ObjectType = {
     [TYPE_ELITE]: 'Elite',
     [TYPE_BOSS]: 'Boss',
 };
-console.log(TypeMonster[0]);
 
 /**
  * La classe Monstre gère le monstre en lui-même.

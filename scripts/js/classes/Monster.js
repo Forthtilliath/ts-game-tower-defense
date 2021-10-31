@@ -8,7 +8,6 @@ const TypeMonster = {
     [TYPE_ELITE]: 'Elite',
     [TYPE_BOSS]: 'Boss',
 };
-console.log(TypeMonster[0]);
 export default class Monster {
     constructor({ id, name, life, movement, damages, flying, gold, type }) {
         this.id = id;

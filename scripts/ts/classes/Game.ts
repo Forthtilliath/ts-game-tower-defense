@@ -36,10 +36,7 @@ class Game {
      * Charge la carte choisit par le joueur
      */
     loadMap(mapId: number) {
-        // Instancie la carte à partir des données du json
-        /**
-         *
-         */
+        /** Instancie la carte à partir des données du json */
         this.currentMap = new Map({
             element: $('#map') as HTMLDivElement,
             tiles: utils.mergeArrays(this.datas.map[mapId].tiles),
