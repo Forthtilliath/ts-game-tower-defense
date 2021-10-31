@@ -5,7 +5,7 @@ interface ObjectType {
     readonly [key: number]: string;
 }
 
-type IMap = {
+type TMap = {
     element: HTMLDivElement;
     tiles: number[];
     nbTiles: { x: number; y: number };
@@ -15,12 +15,12 @@ type IMap = {
     game: Game;
 };
 
-type ITile = {
+type TTile = {
     type: number;
     index: number;
 };
 
-type IMonster = {
+type TMonster = {
     id: number;
     name: string;
     life: number;

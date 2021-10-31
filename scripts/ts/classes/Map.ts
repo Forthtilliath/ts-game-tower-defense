@@ -22,7 +22,7 @@ export default class Map {
     public currentWaves: Wave[];
     public finished: boolean;
 
-    constructor({ element, tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }: IMap) {
+    constructor({ element, tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }: TMap) {
         this.game = game;
 
         /************************************

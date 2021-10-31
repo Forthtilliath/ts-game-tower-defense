@@ -10,7 +10,7 @@ export default class Map {
     private waves;
     currentWaves: Wave[];
     finished: boolean;
-    constructor({ element, tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }: IMap);
+    constructor({ element, tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }: TMap);
     generateWave(): Wave;
     nextWave(): void;
     generateDom(): void;

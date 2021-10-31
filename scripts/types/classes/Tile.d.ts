@@ -2,7 +2,7 @@ export default class Tile {
     private index;
     private type;
     private element;
-    constructor({ type, index }: ITile);
+    constructor({ type, index }: TTile);
     createElement(): HTMLDivElement;
     createEvents(): void;
     createEventConstructible(): void;

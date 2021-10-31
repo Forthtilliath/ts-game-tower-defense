@@ -35,7 +35,7 @@ export default class Monster {
     wave: Wave | undefined;
     container: any;
 
-    constructor({ id, name, life, movement, damages, flying, gold, type }: IMonster) {
+    constructor({ id, name, life, movement, damages, flying, gold, type }: TMonster) {
         // Données du json
         this.id = id;
         this.name = name;

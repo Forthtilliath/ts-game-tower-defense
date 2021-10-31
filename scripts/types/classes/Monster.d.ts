@@ -12,7 +12,7 @@ export default class Monster {
     route: number[];
     wave: Wave | undefined;
     container: any;
-    constructor({ id, name, life, movement, damages, flying, gold, type }: IMonster);
+    constructor({ id, name, life, movement, damages, flying, gold, type }: TMonster);
     createElement(): HTMLDivElement;
     createEvents(): void;
     initialPosition(): void;

@@ -24,7 +24,7 @@ export default class Tile {
     /**
      * @param {{ index: number, type: number }} Tile
      */
-    constructor({ type, index }: ITile) {
+    constructor({ type, index }: TTile) {
         /** Index de la case dans le tableau global */
         this.index = index;
         /** Type de case */

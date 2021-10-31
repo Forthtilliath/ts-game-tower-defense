@@ -1,15 +1,17 @@
 export default class Game {
-    private currentMap;
-    private datas;
-    private isPlaying;
-    private timestamp;
-    private animFrameId;
+    private _currentMap;
+    private _datas;
+    private _isPlaying;
+    private _timestamp;
+    private _animFrameId;
     private constructor();
+    get isPlaying(): boolean;
+    setPlaying(newState?: boolean): void;
     static CreateAsync: () => Promise<Game>;
     loadMap(mapId: number): void;
-    play(): void;
-    stop(): void;
-    updateStates(): void;
-    update(): void;
+    private play;
+    private stop;
+    private updateStates;
+    private update;
 }
 export declare const GameInitialized: Promise<Game>;
