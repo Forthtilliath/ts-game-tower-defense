@@ -1,7 +1,7 @@
 import utils, { $ } from '../utils.js';
 import Map from './Map.js';
 
-class Game {
+export default class Game {
     private currentMap: Map | undefined;
     private datas: any;
     private isPlaying: boolean;
@@ -71,21 +71,7 @@ class Game {
         this.timestamp += 1;
 
         this.updateStates();
-
-        // Test du mode pause
-        if (this.timestamp === 50) {
-            // Met en pause
-            console.log('Pause activée');
-            this.stop();
-
-            // Remet en lecture
-            setTimeout(() => {
-                console.log('Lecture activée');
-                this.update();
-            }, 3000);
-        }
     }
 }
 
-// export default new Promise(() => new Game());
-export default Game.CreateAsync();
+export const GameInitialized =  Game.CreateAsync();

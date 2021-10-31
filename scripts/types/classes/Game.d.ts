@@ -1,4 +1,4 @@
-declare class Game {
+export default class Game {
     private currentMap;
     private datas;
     private isPlaying;
@@ -12,5 +12,4 @@ declare class Game {
     updateStates(): void;
     update(): void;
 }
-declare const _default: Promise<Game>;
-export default _default;
+export declare const GameInitialized: Promise<Game>;

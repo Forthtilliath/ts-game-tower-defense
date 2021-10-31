@@ -1,10 +1,19 @@
-import Game from './classes/Game.js'; 
+import Game, { GameInitialized } from './classes/Game.js';
 
-Game.then(myGame => {
+const btn_startWave = document.querySelector('#startWave') as HTMLElement;
+let started = false;
+
+// 
+GameInitialized.then((myGame) => {
+    // Charge la map numéro 1
     myGame.loadMap(1);
 
-    // Lance la map et donc la première vague
-    // myGame.play();
+    btn_startWave.style.setProperty('display', 'block');
+    btn_startWave.addEventListener('click', () => handleGame(myGame));
+});
 
-    // Suite du code
-})
+function handleGame(theGame: Game) {
+    started ? theGame.stop() : theGame.play();
+    started = !started;
+    btn_startWave.textContent = started ? 'Pause' : 'Lecture'
+}

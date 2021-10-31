@@ -1,7 +1,7 @@
 var _a;
 import utils, { $ } from '../utils.js';
 import Map from './Map.js';
-class Game {
+export default class Game {
     constructor() {
         this.currentMap = undefined;
         this.isPlaying = false;
@@ -36,14 +36,6 @@ class Game {
         this.animFrameId = requestAnimationFrame(() => this.update());
         this.timestamp += 1;
         this.updateStates();
-        if (this.timestamp === 50) {
-            console.log('Pause activée');
-            this.stop();
-            setTimeout(() => {
-                console.log('Lecture activée');
-                this.update();
-            }, 3000);
-        }
     }
 }
 _a = Game;
@@ -52,4 +44,4 @@ Game.CreateAsync = async () => {
     theGame.datas = await utils.loadJson('../json/datas.json');
     return theGame;
 };
-export default Game.CreateAsync();
+export const GameInitialized = Game.CreateAsync();
