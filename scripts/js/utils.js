@@ -7,6 +7,7 @@ export const loadJson = async (url) => {
     }
     catch (err) {
         console.error(err);
+        return null;
     }
 };
 export const mergeArrays = (arr) => arr.reduce((accArr, currArr) => accArr.concat(...currArr), []);

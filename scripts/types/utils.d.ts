@@ -1,4 +1,4 @@
-export declare const $: (selector: string) => Element | null;
+export declare const $: (selector: string) => HTMLElement;
 export declare const compareArrays: (array1: any[], array2: any[]) => boolean;
 export declare const appendChilds: (parent: HTMLElement, elements: HTMLElement[]) => void;
 export declare const loadJson: (url: string) => Promise<any>;

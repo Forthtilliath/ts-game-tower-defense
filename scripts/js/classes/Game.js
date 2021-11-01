@@ -1,9 +1,9 @@
 var _a;
 import utils, { $ } from '../utils.js';
+import Json from './Json.js';
 import Map from './Map.js';
 export default class Game {
     constructor() {
-        this._currentMap = undefined;
         this._isPlaying = false;
         this._timestamp = 0;
         this._animFrameId = 0;
@@ -19,7 +19,7 @@ export default class Game {
     loadMap(mapId) {
         this._currentMap = new Map({
             element: $('#map'),
-            tiles: utils.mergeArrays(this._datas.map[mapId].tiles),
+            tiles: this._datas.map[mapId].tiles.flatMap((x) => x),
             nbTiles: this._datas.map[mapId].nbTiles,
             waves: utils.getContentByIds(this._datas.map[mapId].waves, this._datas.waves),
             jsonMonsters: this._datas.monsters,
@@ -47,7 +47,8 @@ export default class Game {
 _a = Game;
 Game.CreateAsync = async () => {
     const theGame = new Game();
-    theGame._datas = await utils.loadJson('../json/datas.json');
+    theGame._json = await Json.Load('../json/datas.json');
+    theGame._datas = theGame._json.data;
     return theGame;
 };
 export const GameInitialized = Game.CreateAsync();

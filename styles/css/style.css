@@ -139,6 +139,7 @@ header .primary .link:hover {
   grid-template-rows: repeat(var(--nbRows), var(--tile-size));
   grid-template-columns: repeat(var(--nbColumns), var(--tile-size));
   gap: 10px;
+  padding: 10px;
   background-color: #e3bb70;
   position: relative;
 }

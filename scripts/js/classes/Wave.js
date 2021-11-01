@@ -11,7 +11,7 @@ export default class Wave {
         this.gold = gold;
         this.difficulty = difficulty;
         this.arrPopMonsters = this.generatePopMonsters();
-        console.log(this.arrPopMonsters);
+        C.LOG_WAVE && console.log(this.arrPopMonsters);
         this.arrMonstersInMap = [];
         this.delaiBeforeNextWave = C.WAVE_DELAI * 1000;
         this.timeout = 0;
@@ -29,7 +29,7 @@ export default class Wave {
     popMonster() {
         if (this.arrPopMonsters.length) {
             const monster = this.arrPopMonsters.pop();
-            console.log('Vague', this.id, 'Apparition du monstre', monster);
+            C.LOG_WAVE && console.log('Vague', this.id, 'Apparition du monstre', monster);
             monster?.setRoute(this.map.getRoutes()[0]);
             monster?.setWave(this);
             monster?.initialPosition();

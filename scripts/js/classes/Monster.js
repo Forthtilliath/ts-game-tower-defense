@@ -1,3 +1,4 @@
+import C from '../constants.js';
 const TYPE_COMMON = 0;
 const TYPE_RARE = 1;
 const TYPE_ELITE = 2;
@@ -46,12 +47,12 @@ export default class Monster {
         const rect = this.element.getBoundingClientRect();
         this.element.style.setProperty('top', rect.y + 5 + 'px');
         if (rect.y > 666) {
-            console.log('Vague', this.wave.waveNumber, 'Disparition du monstre', this);
+            C.LOG_WAVE && console.log('Vague', this.wave.waveNumber, 'Disparition du monstre', this);
             this.wave.arrMonstersInMap = this.wave.arrMonstersInMap.filter((monster) => monster.element !== this.element);
             this.element.remove();
             if (!(this.wave.arrMonstersInMap.length + this.wave.arrPopMonsters.length)) {
                 this.wave.map.currentWaves = this.wave.map.currentWaves.filter((wave) => wave !== this.wave);
-                console.log('Vague', this.wave.waveNumber, 'terminée !');
+                C.LOG_WAVE && console.log('Vague', this.wave.waveNumber, 'terminée !');
                 if (this.wave.map.finished) {
                     this.wave.map.game.stop();
                 }

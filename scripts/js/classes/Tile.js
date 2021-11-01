@@ -23,7 +23,6 @@ export default class Tile {
     createElement() {
         const div = document.createElement('div');
         div.classList.add('tile');
-        div.textContent = this.getContent().toString();
         return div;
     }
     createEvents() {
@@ -49,7 +48,6 @@ export default class Tile {
         this.removeEvents();
         this.removeClasses();
         this.type = TYPE_TURRET;
-        this.element.textContent = this.getContent().toString();
         this.createEvents();
         this.addClasses();
     }

@@ -1,9 +1,10 @@
 import utils, { $ } from '../utils.js';
+import Json from './Json.js';
 import Map from './Map.js';
 
 export default class Game {
     /** Carte à laquelle le joueur joue */
-    private _currentMap: Map | undefined;
+    private _currentMap?: Map;
     private _datas: any;
     /** Jeu en mode play ou non */
     private _isPlaying: boolean;
@@ -11,9 +12,9 @@ export default class Game {
     private _timestamp: number;
     /** Id de l'animation pour être capable de la supprimer par la suite */
     private _animFrameId: number;
+    private _json?: Json;
 
     private constructor() {
-        this._currentMap = undefined;
         this._isPlaying = false;
         this._timestamp = 0;
         this._animFrameId = 0;
@@ -42,18 +43,18 @@ export default class Game {
     public static CreateAsync = async () => {
         const theGame = new Game();
         /** Toute les données contenues dans le json */
-        theGame._datas = await utils.loadJson('../json/datas.json');
+        // theGame._datas = await utils.loadJson('../json/datas.json');
+        theGame._json = await Json.Load('../json/datas.json');
+        theGame._datas = theGame._json.data;
         return theGame;
     };
 
-    /**
-     * Charge la carte choisit par le joueur
-     */
+    /** Charge la carte choisit par le joueur */
     public loadMap(mapId: number) {
-        /** Instancie la carte à partir des données du json */
+        // Instancie la carte à partir des données du json
         this._currentMap = new Map({
             element: $('#map') as HTMLDivElement,
-            tiles: utils.mergeArrays(this._datas.map[mapId].tiles),
+            tiles: this._datas.map[mapId].tiles.flatMap((x:any) => x),
             nbTiles: this._datas.map[mapId].nbTiles,
             waves: utils.getContentByIds(this._datas.map[mapId].waves, this._datas.waves),
             jsonMonsters: this._datas.monsters,

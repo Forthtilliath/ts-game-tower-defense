@@ -1,9 +1,10 @@
 export default class Game {
-    private _currentMap;
+    private _currentMap?;
     private _datas;
     private _isPlaying;
     private _timestamp;
     private _animFrameId;
+    private _json?;
     private constructor();
     get isPlaying(): boolean;
     setPlaying(newState?: boolean): void;

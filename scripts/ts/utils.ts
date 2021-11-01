@@ -16,7 +16,8 @@ export const loadJson = async (url: string) => {
     try {
         return await fetch(url).then(res => res.json());
     } catch (err) {
-        console.error(err); // Log les erreurs dans la console
+        console.error(err);
+        return null;
     }
 }; 
 

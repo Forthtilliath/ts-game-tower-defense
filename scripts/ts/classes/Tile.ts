@@ -1,3 +1,5 @@
+import C from '../constants.js';
+
 const TYPE_DECOR: number = 0;
 const TYPE_START: number = 1;
 const TYPE_ROUTE: number = 2;
@@ -21,9 +23,7 @@ export default class Tile {
     private index: number;
     private type: number;
     private element: HTMLDivElement;
-    /**
-     * @param {{ index: number, type: number }} Tile
-     */
+    
     constructor({ type, index }: TTile) {
         /** Index de la case dans le tableau global */
         this.index = index;
@@ -36,21 +36,16 @@ export default class Tile {
         this.createEvents();
     }
 
-    /**
-     * Génère une div avec la classe tile ainsi que la classe correspondant à son type
-     * @returns {HTMLDivElement}
-     */
-    createElement() {
+    /** Génère une div avec la classe tile ainsi que la classe correspondant à son type */
+    createElement():HTMLDivElement {
         const div = document.createElement('div');
         div.classList.add('tile');
-        div.textContent = this.getContent().toString();
+        // div.textContent = this.getContent().toString();
 
         return div;
     }
 
-    /**
-     * Génère les events de la case en fonction du type de case que c'est
-     */
+    /** Génère les events de la case en fonction du type de case que c'est */
     createEvents() {
         switch (this.type) {
             case TYPE_DECOR:
@@ -80,44 +75,36 @@ export default class Tile {
         this.removeEvents();
         this.removeClasses();
         this.type = TYPE_TURRET;
-        this.element.textContent = this.getContent().toString();
+        // this.element.textContent = this.getContent().toString();
         this.createEvents();
         this.addClasses();
     }
 
     /**
      * Event lorsque l'on clique sur une case tourelle
-     * Actuellement, cliquer sur une case tower ne fait rien de spéciale
+     * Actuellement, cliquer sur une case tower ne fait rien de spécial
      */
     createEventTower() {
         console.log('tourelle', this.element);
     }
 
-    /**
-     * Supprime tous les events de l'éléments en faisant une copie de l'élément
-     */
+    /** Supprime tous les events de l'éléments en faisant une copie de l'élément */
     removeEvents() {
         this.element.replaceWith((this.element = this.element.cloneNode(true) as HTMLDivElement));
     }
 
-    /**
-     * Ajoute la classe CSS à la case en fonction de son type
-     */
+    /** Ajoute la classe CSS à la case en fonction de son type */
     addClasses() {
         this.element.classList.add(arrTypeClasses[this.type]);
     }
 
-    /**
-     * Retire la classe CSS en rapport avec le type de case
-     */
+    /** Retire la classe CSS en rapport avec le type de case */
     removeClasses() {
         // this.element.classList.remove(...arrTypeClasses);
         this.element.classList.remove(arrTypeClasses[this.type]);
     }
 
-    /**
-     * Contenu à mettre dans la div
-     */
+    /** Contenu à mettre dans la div */
     getContent() {
         return this.index;
     }

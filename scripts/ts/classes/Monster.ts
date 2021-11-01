@@ -1,4 +1,5 @@
 import Wave from './Wave.js';
+import C from '../constants.js';
 
 const TYPE_COMMON: number = 0;
 const TYPE_RARE: number = 1;
@@ -119,7 +120,7 @@ export default class Monster {
 
         // Si le monstre a atteint la sortie
         if (rect.y > 666) {
-            console.log('Vague', this.wave!.waveNumber, 'Disparition du monstre', this);
+            C.LOG_WAVE && console.log('Vague', this.wave!.waveNumber, 'Disparition du monstre', this);
             // Retire le monstre du tableau
             this.wave!.arrMonstersInMap = this.wave!.arrMonstersInMap.filter(
                 (monster) => monster.element !== this.element,
@@ -131,7 +132,7 @@ export default class Monster {
             if (!(this.wave!.arrMonstersInMap.length + this.wave!.arrPopMonsters.length)) {
                 // Retire la vague du tableau
                 this.wave!.map.currentWaves = this.wave!.map.currentWaves.filter((wave) => wave !== this.wave);
-                console.log('Vague', this.wave!.waveNumber, 'terminée !');
+                C.LOG_WAVE && console.log('Vague', this.wave!.waveNumber, 'terminée !');
 
                 // Si c'était la dernière vague de la map, on termine le jeu
                 if (this.wave!.map.finished) {

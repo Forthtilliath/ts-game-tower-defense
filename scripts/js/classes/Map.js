@@ -16,7 +16,7 @@ export default class Map {
         this.finished = false;
     }
     generateWave() {
-        console.log('Génération de la vague', this.currentWaveIndex);
+        C.LOG_WAVE && console.log('Génération de la vague', this.currentWaveIndex);
         return new Wave({
             ...this.waves[this.currentWaveIndex],
             jsonMonsters: this.jsonMonsters,
