@@ -1,7 +1,8 @@
-import utils from '../utils.js';
+import utils, { $ } from '../utils.js';
 import Tile from './Tile.js';
 import Wave from './Wave.js';
 import C from '../constants.js';
+import Game from './Game.js';
 
 /**
  * La classe Map gère tout ce qui est en rapport avec la map.
@@ -11,21 +12,21 @@ import C from '../constants.js';
  * + createEvents() : Génère les évènements de la map
  */
 export default class Map {
-    public game: any;
+    public _game: Game;
     /** Element dans le DOM */
-    private element: HTMLDivElement;
+    private _element: HTMLDivElement;
     /** Nombre de cases en X et Y */
-    private nbTiles: { x: number; y: number };
+    private _nbTiles: { x: number; y: number };
     /** Tableau contenant toutes les cases */
-    public arrTiles: any[];
+    public _arrTiles: any[];
     /** Tableau des routes de la map (valeurs brut du json) */
-    private jsonMapRoutes: number[][];
+    private _jsonMapRoutes: number[][];
     /** Tableau des monstres (valeurs brut du json) */
-    private jsonMonsters: TJsonMonster[];
+    private _jsonMonsters: TJsonMonster[];
     /** Vague courante, démarre à -1 */
-    private currentWaveIndex: number;
+    private _currentWaveIndex: number;
     /** Tableau contenant l'ensemble des vagues de la map */
-    private waves: object[];
+    private _waves: object[];
     /************************************
      * Tableau contenant l'ensemble des vagues présentes sur la map
      *
@@ -40,28 +41,28 @@ export default class Map {
     /** Contient l'état du jeu */
     public finished: boolean;
 
-    constructor({ element, tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }: TMap) {
-        this.game = game;
-        this.element = element;
-        this.nbTiles = nbTiles;
-        this.arrTiles = tiles.map((type, index) => new Tile({ type, index }));
-        this.jsonMapRoutes = jsonMapRoutes;
-        this.jsonMonsters = jsonMonsters;
-        this.currentWaveIndex = -1;
-        this.waves = waves;
+    constructor({ tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }: TMap) {
+        this._game = game;
+        this._element = $('#map') as HTMLDivElement;
+        this._nbTiles = nbTiles;
+        this._arrTiles = tiles.map((type, index) => new Tile({ type, index, map: this }));
+        this._jsonMapRoutes = jsonMapRoutes;
+        this._jsonMonsters = jsonMonsters;
+        this._currentWaveIndex = -1;
+        this._waves = waves;
         this.currentWaves = [];
         this.finished = false;
     }
 
     /** Génère une nouvelle vague à partir de l'index de la vague courante */
     generateWave(): Wave {
-        C.LOG_WAVE && console.log('Génération de la vague', this.currentWaveIndex);
+        C.LOG_WAVE && console.log('Génération de la vague', this._currentWaveIndex);
         // NOTE modifier map par routes ?
         return new Wave({
-            ...this.waves[this.currentWaveIndex],
-            jsonMonsters: this.jsonMonsters,
+            ...this._waves[this._currentWaveIndex],
+            jsonMonsters: this._jsonMonsters,
             map: this,
-            waveNumber: this.currentWaveIndex,
+            waveNumber: this._currentWaveIndex,
         } as TWave);
     }
 
@@ -69,8 +70,8 @@ export default class Map {
     nextWave() {
         if (this.finished) return;
 
-        if (this.currentWaveIndex < this.waves.length - 1) {
-            this.currentWaveIndex++;
+        if (this._currentWaveIndex < this._waves.length - 1) {
+            this._currentWaveIndex++;
             this.currentWaves.push(this.generateWave());
             this.createEvents();
         } else {
@@ -81,20 +82,20 @@ export default class Map {
     /** Génère le DOM en fonction du tableau des cases */
     generateDom() {
         // Modifie les variables CSS pour adapter le grid en fonction du nombre de cases en X et Y
-        this.element.style.setProperty('--nbColumns', this.nbTiles.x.toString());
-        this.element.style.setProperty('--nbRows', this.nbTiles.y.toString());
-        this.element.style.setProperty('--tile-size', C.TILE_DEFAULT_SIZE);
+        this._element.style.setProperty('--nbColumns', this._nbTiles.x.toString());
+        this._element.style.setProperty('--nbRows', this._nbTiles.y.toString());
+        this._element.style.setProperty('--tile-size', C.TILE_DEFAULT_SIZE);
 
         // Ajoute les cases dans la map
         utils.appendChilds(
-            this.element,
-            this.arrTiles.map((tile) => tile.element),
+            this._element,
+            this._arrTiles.map((tile) => tile.element),
         );
     }
 
     /** Retourne les routes de la map */
     getRoutes() {
-        return this.jsonMapRoutes;
+        return this._jsonMapRoutes;
     }
 
     /** Génère les évènements de la map */

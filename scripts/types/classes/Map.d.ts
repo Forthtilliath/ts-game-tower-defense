@@ -1,16 +1,17 @@
 import Wave from './Wave.js';
+import Game from './Game.js';
 export default class Map {
-    game: any;
-    private element;
-    private nbTiles;
-    arrTiles: any[];
-    private jsonMapRoutes;
-    private jsonMonsters;
-    private currentWaveIndex;
-    private waves;
+    _game: Game;
+    private _element;
+    private _nbTiles;
+    _arrTiles: any[];
+    private _jsonMapRoutes;
+    private _jsonMonsters;
+    private _currentWaveIndex;
+    private _waves;
     currentWaves: Wave[];
     finished: boolean;
-    constructor({ element, tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }: TMap);
+    constructor({ tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }: TMap);
     generateWave(): Wave;
     nextWave(): void;
     generateDom(): void;

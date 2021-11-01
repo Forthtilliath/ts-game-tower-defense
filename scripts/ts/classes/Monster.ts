@@ -23,53 +23,53 @@ const TypeMonster: ObjectType = {
  * + setWave() : Met à jour la vague à laquelle le monstre appartient
  */
 export default class Monster {
-    id: number;
-    name: string;
-    life: number;
-    movement: number;
-    flying: boolean;
-    gold: number;
-    damages: number;
-    type: number;
-    element: HTMLDivElement;
-    route: number[];
-    wave: Wave | undefined;
-    container: any;
+    private _id: number;
+    private _name: string;
+    private _life: number;
+    private _movement: number;
+    private _flying: boolean;
+    private _gold: number;
+    private _damages: number;
+    private _type: number;
+    private _element: HTMLDivElement;
+    private _route: number[];
+    private _wave: Wave | undefined;
+    private _container: any;
 
     constructor({ id, name, life, movement, damages, flying, gold, type }: TMonster) {
         // Données du json
-        this.id = id;
-        this.name = name;
-        this.life = life;
-        this.movement = movement;
-        this.flying = flying;
-        this.gold = gold;
-        this.damages = damages;
-        this.type = type;
+        this._id = id;
+        this._name = name;
+        this._life = life;
+        this._movement = movement;
+        this._flying = flying;
+        this._gold = gold;
+        this._damages = damages;
+        this._type = type;
 
         /**
          * Element du DOM lié à la case
          * @type {HTMLDivElement}
          */
-        this.element = this.createElement();
+        this._element = this.createElement();
 
         /**
          * Route que le monstre va suivre
          * @type number[]
          */
-        this.route = [];
+        this._route = [];
 
         /**
          * Wave à laquelle le monstre appartient
          * @type Wave
          */
-        this.wave = undefined;
+        this._wave = undefined;
 
         /**
          * Container des monsters
          * @type {HTMLDivElement}
          */
-        this.container = document.querySelector('#monsters');
+        this._container = document.querySelector('#monsters');
     }
 
     /**
@@ -92,7 +92,7 @@ export default class Monster {
      */
     initialPosition() {
         // Récupère la position et la taille de la carte de départ de la vague
-        const rectTile = this.wave!.map.arrTiles[this.route[0]].element.getBoundingClientRect();
+        const rectTile = this._wave!.map._arrTiles[this._route[0]].element.getBoundingClientRect();
 
         // Met à jour la position et la taille de la div du monstre
         // WARNING : La div n'est pas redimensionnée avec la page
@@ -102,10 +102,10 @@ export default class Monster {
             width: rectTile.width + 'px',
             height: rectTile.height + 'px',
         };
-        Object.assign(this.element.style, style);
+        Object.assign(this._element.style, style);
 
         // Ajoute le monstre au body afin de pouvoir le déplacer plus facilement d'une case à une autre
-        this.container.appendChild(this.element);
+        this._container.appendChild(this._element);
 
         // Génère les évènements pour le faire se déplacer sur la route
         this.createEvents();
@@ -115,28 +115,29 @@ export default class Monster {
      * Met à jour la position du monstre
      */
     setPosition() {
-        const rect = this.element.getBoundingClientRect();
-        this.element.style.setProperty('top', rect.y + 5 + 'px');
+        const rect = this._element.getBoundingClientRect();
+        this._element.style.setProperty('top', rect.y + 5 + 'px');
 
         // Si le monstre a atteint la sortie
         if (rect.y > 666) {
-            C.LOG_WAVE && console.log('Vague', this.wave!.waveNumber, 'Disparition du monstre', this);
+            C.LOG_WAVE && console.log('Vague', this._wave!.waveNumber, 'Disparition du monstre', this);
             // Retire le monstre du tableau
-            this.wave!.arrMonstersInMap = this.wave!.arrMonstersInMap.filter(
-                (monster) => monster.element !== this.element,
+            this._wave!.arrMonstersInMap = this._wave!.arrMonstersInMap.filter(
+                (monster) => monster._element !== this._element,
             );
             // Retire le monstre du dom
-            this.element.remove();
+            this._element.remove();
 
             // On vérifie qu'il ne reste pas des monstre sur le carte ainsi qu'à apparaitre
-            if (!(this.wave!.arrMonstersInMap.length + this.wave!.arrPopMonsters.length)) {
+            if (!(this._wave!.arrMonstersInMap.length + this._wave!.arrPopMonsters.length)) {
                 // Retire la vague du tableau
-                this.wave!.map.currentWaves = this.wave!.map.currentWaves.filter((wave) => wave !== this.wave);
-                C.LOG_WAVE && console.log('Vague', this.wave!.waveNumber, 'terminée !');
+                this._wave!.map.currentWaves = this._wave!.map.currentWaves.filter((wave) => wave !== this._wave);
+                C.LOG_WAVE && console.log('Vague', this._wave!.waveNumber, 'terminée !');
 
                 // Si c'était la dernière vague de la map, on termine le jeu
-                if (this.wave!.map.finished) {
-                    this.wave!.map.game.stop();
+                if (this._wave!.map.finished) {
+                    // this.wave!.map.game.stop();
+                    this._wave!.map._game.setPlaying();
                 }
             }
         }
@@ -146,14 +147,14 @@ export default class Monster {
      * Met à jour la route du monstre
      */
     setRoute(route: number[]) {
-        this.route = route;
+        this._route = route;
     }
 
     /**
      * Met à jour la vague à laquelle le monstre appartient
      */
     setWave(wave: Wave) {
-        this.wave = wave;
+        this._wave = wave;
     }
 
     updateStates(timestamp: number) {

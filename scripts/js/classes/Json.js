@@ -16,14 +16,14 @@ export default class Json {
     get player() {
         return this._data?.player;
     }
-    set map(i) {
-        this._map = this._data?.map[i];
+    setMap(i) {
+        this._map = this._data?.maps[i];
         this._tiles = this._map?.tiles.flatMap((x) => x);
         this._routes = this._map?.routes;
     }
     getMap(i) {
         if (typeof i === 'number')
-            return this._data?.map[i];
+            return this._data?.maps[i];
         return this._map;
     }
     get turrets() {
@@ -42,6 +42,12 @@ export default class Json {
     }
     get tiles() {
         return this._tiles;
+    }
+    get routes() {
+        return this._routes;
+    }
+    get nbWaves() {
+        return this._map?.waves.length;
     }
 }
 export const JsonLoaded = Json.Load('../json/datas.json');

@@ -1,4 +1,6 @@
 import C from '../constants.js';
+import utils from '../utils.js';
+import Map from './Map.js';
 
 const TYPE_DECOR: number = 0;
 const TYPE_START: number = 1;
@@ -7,9 +9,7 @@ const TYPE_END: number = 3;
 const TYPE_CONSTRUCTIBLE: number = 4;
 const TYPE_TURRET: number = 5;
 
-/**
- * Tableau contenant les classes à ajouter en fonction du type
- */
+/** Tableau contenant les classes à ajouter en fonction du type */
 const arrTypeClasses: ObjectType = {
     [TYPE_DECOR]: 'decor',
     [TYPE_START]: 'start',
@@ -20,34 +20,41 @@ const arrTypeClasses: ObjectType = {
 };
 
 export default class Tile {
-    private index: number;
-    private type: number;
-    private element: HTMLDivElement;
-    
-    constructor({ type, index }: TTile) {
-        /** Index de la case dans le tableau global */
-        this.index = index;
-        /** Type de case */
-        this.type = type;
-        /** Element du DOM lié à la case */
-        this.element = this.createElement();
+    /** Index de la case dans le tableau global */
+    private _index: number;
+    /** Type de case */
+    private _type: number;
+    /** Element du DOM lié à la case */
+    private _element: HTMLDivElement;
+    /** Map en cours */
+    private _map: Map;
+
+    constructor({ type, index, map }: TTile) {
+        this._index = index;
+        this._type = type;
+        this._map = map;
+        this._element = this.createElement();
 
         this.addClasses();
         this.createEvents();
     }
 
+    public get element() {
+        return this._element;
+    }
+
     /** Génère une div avec la classe tile ainsi que la classe correspondant à son type */
-    createElement():HTMLDivElement {
+    createElement(): HTMLDivElement {
         const div = document.createElement('div');
         div.classList.add('tile');
-        // div.textContent = this.getContent().toString();
+        C.TEXTCONTENT_TILE && (div.textContent = this.getContent().toString());
 
         return div;
     }
 
     /** Génère les events de la case en fonction du type de case que c'est */
     createEvents() {
-        switch (this.type) {
+        switch (this._type) {
             case TYPE_DECOR:
                 break;
             case TYPE_START:
@@ -57,10 +64,10 @@ export default class Tile {
             case TYPE_END:
                 break;
             case TYPE_CONSTRUCTIBLE:
-                this.element.addEventListener('click', () => this.createEventConstructible());
+                this._element.addEventListener('click', () => this.createEventConstructible());
                 break;
             case TYPE_TURRET:
-                this.element.addEventListener('click', () => this.createEventTower());
+                this._element.addEventListener('click', () => this.createEventTower());
                 break;
         }
     }
@@ -70,14 +77,22 @@ export default class Tile {
      * Actuellement, cliquer sur une case constructible la transforme directement en tourelle
      */
     createEventConstructible() {
-        console.log('constructible', this.element);
+        const turretCost = 100;
+        console.log('constructible', this._element, 'cost', turretCost);
+        if (this.getPlayerGold() >= turretCost) {
+            // Met à jour l'or du joueur
+            this.setPlayerGold(-turretCost);
 
-        this.removeEvents();
-        this.removeClasses();
-        this.type = TYPE_TURRET;
-        // this.element.textContent = this.getContent().toString();
-        this.createEvents();
-        this.addClasses();
+            // 
+            this.removeEvents();
+            this.removeClasses();
+            this._type = TYPE_TURRET;
+            C.TEXTCONTENT_TILE && (this._element.textContent = this.getContent().toString());
+            this.addClasses();
+            this.createEvents();
+        } else {
+            console.log("%cOr insuffisant !", "color:red;");
+        }
     }
 
     /**
@@ -85,27 +100,37 @@ export default class Tile {
      * Actuellement, cliquer sur une case tower ne fait rien de spécial
      */
     createEventTower() {
-        console.log('tourelle', this.element);
+        console.log('tourelle', this._element);
     }
 
     /** Supprime tous les events de l'éléments en faisant une copie de l'élément */
     removeEvents() {
-        this.element.replaceWith((this.element = this.element.cloneNode(true) as HTMLDivElement));
+        this._element.replaceWith((this._element = this._element.cloneNode(true) as HTMLDivElement));
     }
 
     /** Ajoute la classe CSS à la case en fonction de son type */
     addClasses() {
-        this.element.classList.add(arrTypeClasses[this.type]);
+        this._element.classList.add(arrTypeClasses[this._type]);
     }
 
     /** Retire la classe CSS en rapport avec le type de case */
     removeClasses() {
         // this.element.classList.remove(...arrTypeClasses);
-        this.element.classList.remove(arrTypeClasses[this.type]);
+        this._element.classList.remove(arrTypeClasses[this._type]);
     }
 
     /** Contenu à mettre dans la div */
     getContent() {
-        return this.index;
+        return this._index;
+    }
+
+    /** Récupère le montant d'or du joueur */
+    getPlayerGold() {
+        return this._map._game.interface.playerGold;
+    }
+
+    /** Récupère le montant d'or du joueur */
+    setPlayerGold(transaction: number) {
+        this._map._game.interface.setGold(transaction);
     }
 }

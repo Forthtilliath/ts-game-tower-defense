@@ -1,23 +1,30 @@
 import utils, { $ } from '../utils.js';
+import Interface from './Interface.js';
 import Json from './Json.js';
 import Map from './Map.js';
+// import Player from './Player.js';
 
 export default class Game {
     /** Carte à laquelle le joueur joue */
     private _currentMap?: Map;
-    private _datas: any;
+    /** Données du json */
+    private _datas?: TJson; // TODO A supprimer plus tard
+    private _json?: Json;
     /** Jeu en mode play ou non */
     private _isPlaying: boolean;
     /** Timer de la partie. Un timestamp de 1 correspond à 1 seconde. */
     private _timestamp: number;
     /** Id de l'animation pour être capable de la supprimer par la suite */
     private _animFrameId: number;
-    private _json?: Json;
+    /** Infos du joueur */
+    // private _player?: Player;
+    private _interface: Interface;
 
     private constructor() {
         this._isPlaying = false;
         this._timestamp = 0;
         this._animFrameId = 0;
+        this._interface = new Interface();
 
         return this;
     }
@@ -26,6 +33,19 @@ export default class Game {
 
     public get isPlaying() {
         return this._isPlaying;
+    }
+
+    public get interface() {
+        return this._interface;
+    }
+
+    public get json() {
+        return this._json;
+    }
+
+    /** Met à jour le contenu de l'interface */
+    public updateInterface() {
+        return this._interface.set(this._json?.player, this._json?.nbWaves);
     }
 
     /**
@@ -43,32 +63,36 @@ export default class Game {
     public static CreateAsync = async () => {
         const theGame = new Game();
         /** Toute les données contenues dans le json */
-        // theGame._datas = await utils.loadJson('../json/datas.json');
         theGame._json = await Json.Load('../json/datas.json');
-        theGame._datas = theGame._json.data;
+        theGame._datas = theGame._json.data; // TODO A supprimer
         return theGame;
     };
 
     /** Charge la carte choisit par le joueur */
     public loadMap(mapId: number) {
+        if (!this._datas) return;
+
+        this.json?.setMap(mapId);
+
         // Instancie la carte à partir des données du json
         this._currentMap = new Map({
-            element: $('#map') as HTMLDivElement,
-            tiles: this._datas.map[mapId].tiles.flatMap((x:any) => x),
-            nbTiles: this._datas.map[mapId].nbTiles,
-            waves: utils.getContentByIds(this._datas.map[mapId].waves, this._datas.waves),
+            tiles: this._datas.maps[mapId].tiles.flatMap((x: any) => x),
+            nbTiles: this._datas.maps[mapId].nbTiles,
+            waves: utils.getContentByIds(this._datas.maps[mapId].waves, this._datas.waves),
             jsonMonsters: this._datas.monsters,
-            jsonMapRoutes: this._datas.map[mapId].routes,
+            jsonMapRoutes: this._datas.maps[mapId].routes,
             game: this,
         });
 
         this._currentMap.generateDom();
     }
 
-    // ANIMATIONS
+    // ANIMATION
 
     private play() {
-        this._currentMap!.nextWave();
+        if (!this._currentMap) return;
+
+        this._currentMap.nextWave();
         this.update();
     }
 
@@ -91,4 +115,4 @@ export default class Game {
     }
 }
 
-export const GameInitialized =  Game.CreateAsync();
+export const GameInitialized = Game.CreateAsync();

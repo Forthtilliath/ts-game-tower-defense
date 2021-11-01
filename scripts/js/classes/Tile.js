@@ -1,3 +1,4 @@
+import C from '../constants.js';
 const TYPE_DECOR = 0;
 const TYPE_START = 1;
 const TYPE_ROUTE = 2;
@@ -13,20 +14,25 @@ const arrTypeClasses = {
     [TYPE_TURRET]: 'turret',
 };
 export default class Tile {
-    constructor({ type, index }) {
-        this.index = index;
-        this.type = type;
-        this.element = this.createElement();
+    constructor({ type, index, map }) {
+        this._index = index;
+        this._type = type;
+        this._map = map;
+        this._element = this.createElement();
         this.addClasses();
         this.createEvents();
+    }
+    get element() {
+        return this._element;
     }
     createElement() {
         const div = document.createElement('div');
         div.classList.add('tile');
+        C.TEXTCONTENT_TILE && (div.textContent = this.getContent().toString());
         return div;
     }
     createEvents() {
-        switch (this.type) {
+        switch (this._type) {
             case TYPE_DECOR:
                 break;
             case TYPE_START:
@@ -36,34 +42,48 @@ export default class Tile {
             case TYPE_END:
                 break;
             case TYPE_CONSTRUCTIBLE:
-                this.element.addEventListener('click', () => this.createEventConstructible());
+                this._element.addEventListener('click', () => this.createEventConstructible());
                 break;
             case TYPE_TURRET:
-                this.element.addEventListener('click', () => this.createEventTower());
+                this._element.addEventListener('click', () => this.createEventTower());
                 break;
         }
     }
     createEventConstructible() {
-        console.log('constructible', this.element);
-        this.removeEvents();
-        this.removeClasses();
-        this.type = TYPE_TURRET;
-        this.createEvents();
-        this.addClasses();
+        const turretCost = 100;
+        console.log('constructible', this._element, 'cost', turretCost);
+        if (this.getPlayerGold() >= turretCost) {
+            this.setPlayerGold(-turretCost);
+            this.removeEvents();
+            this.removeClasses();
+            this._type = TYPE_TURRET;
+            C.TEXTCONTENT_TILE && (this._element.textContent = this.getContent().toString());
+            this.addClasses();
+            this.createEvents();
+        }
+        else {
+            console.log("%cOr insuffisant !", "color:red;");
+        }
     }
     createEventTower() {
-        console.log('tourelle', this.element);
+        console.log('tourelle', this._element);
     }
     removeEvents() {
-        this.element.replaceWith((this.element = this.element.cloneNode(true)));
+        this._element.replaceWith((this._element = this._element.cloneNode(true)));
     }
     addClasses() {
-        this.element.classList.add(arrTypeClasses[this.type]);
+        this._element.classList.add(arrTypeClasses[this._type]);
     }
     removeClasses() {
-        this.element.classList.remove(arrTypeClasses[this.type]);
+        this._element.classList.remove(arrTypeClasses[this._type]);
     }
     getContent() {
-        return this.index;
+        return this._index;
+    }
+    getPlayerGold() {
+        return this._map._game.interface.playerGold;
+    }
+    setPlayerGold(transaction) {
+        this._map._game.interface.setGold(transaction);
     }
 }

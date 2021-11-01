@@ -6,6 +6,10 @@ export default Object.freeze({
     /** Delai en secondes avant de passer au monstre suivant */
     MONSTER_DELAI: 0.5,
 
-    /** Affiche ou non les logs */ 
-    LOG_WAVE: false
+    // === DEV CONSTANTS ===
+
+    /** Affiche ou non les logs liés à la vague */ 
+    LOG_WAVE: false,
+    /** Affiche ou non l'index de la case */
+    TEXTCONTENT_TILE: false
 });

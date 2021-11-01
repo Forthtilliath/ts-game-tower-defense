@@ -12,14 +12,14 @@ export const appendChilds = (parent: HTMLElement, elements: HTMLElement[]) =>
     elements.forEach((element) => parent.appendChild(element));
 
 /** Charge un fichier JSON à partir d'une url */
-export const loadJson = async (url: string) => {
-    try {
-        return await fetch(url).then(res => res.json());
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
-}; 
+// export const loadJson = async (url: string) => {
+//     try {
+//         return await fetch(url).then(res => res.json());
+//     } catch (err) {
+//         console.error(err);
+//         return null;
+//     }
+// }; 
 
 /** Fusionne un tableau à 2 dimensions pour retourner un tableau à une dimension */
 export const mergeArrays = (arr: any[][]) => arr.reduce((accArr, currArr) => accArr.concat(...currArr), []);
@@ -53,12 +53,16 @@ export const trajCalculation = (
 /** Calcul de la distance en ligne droite entre 2 points */
 export const distCalculation = (deltaX: number, deltaY: number): number => Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
+export const launchEvent = (eventName: string, detail: object) => {
+    window.dispatchEvent(new CustomEvent(eventName, { detail }));
+}
+
 export default {
     compareArrays,
     appendChilds,
-    loadJson,
     mergeArrays,
     getContentById,
     getContentByIds,
     trajCalculation,
+    launchEvent
 };

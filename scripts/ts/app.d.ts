@@ -2,10 +2,14 @@ interface ObjectType {
     readonly [key: number]: string;
 }
 
+type XY = {
+    x: number;
+    y: number;
+};
+
 type TMap = {
-    element: HTMLDivElement;
     tiles: number[];
-    nbTiles: { x: number; y: number };
+    nbTiles: XY;
     waves: object[];
     readonly jsonMonsters: TJsonMonster[];
     readonly jsonMapRoutes: number[][];
@@ -15,6 +19,7 @@ type TMap = {
 type TTile = {
     type: number;
     index: number;
+    map: Map;
 };
 
 type TMonster = {
@@ -49,7 +54,7 @@ type TJsonPlayer = {
 };
 
 type TJsonMap = {
-    nbTiles: { x: number; y: number };
+    nbTiles: XY;
     tiles: number[][];
     waves: number[];
     routes: number[][];
@@ -83,7 +88,7 @@ type TJsonWave = {
 
 type TJson = {
     player: TJsonPlayer;
-    map: TJsonMap[];
+    maps: TJsonMap[];
     turrets: TJsonTurret[];
     monsters: TJsonMonster[];
     waves: TJsonWave[];

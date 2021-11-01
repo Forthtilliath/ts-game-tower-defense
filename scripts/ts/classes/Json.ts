@@ -25,15 +25,16 @@ export default class Json {
         return this._data?.player;
     }
 
-    public set map(i: number) {
-        this._map = this._data?.map[i];
+    /** Met à jour la map pour récupérer plus facilement les cases et les routes */ 
+    public setMap(i: number) {
+        this._map = this._data?.maps[i];
         this._tiles = this._map?.tiles.flatMap((x) => x);
         this._routes = this._map?.routes;
     }
 
     public getMap(i?: number) {
         // Si un index de map a été passé en param, on renvoit la map demandée
-        if (typeof i === 'number') return this._data?.map[i];
+        if (typeof i === 'number') return this._data?.maps[i];
 
         // Renvoit la map en cours
         return this._map;
@@ -52,15 +53,23 @@ export default class Json {
     }
 
     public getWave(i?: number) {
-        // Si un index de map a été passé en param, on renvoit la map demandée
+        // Si un index de vague a été passé en param, on renvoit la vague demandée
         if (typeof i === 'number') return this._data?.waves[i];
 
-        // Renvoit la map en cours
+        // Renvoit la vague en cours
         return this._wave;
     }
 
     public get tiles() {
         return this._tiles;
+    }
+
+    public get routes() {
+        return this._routes;
+    }
+
+    public get nbWaves() {
+        return this._map?.waves.length;
     }
 }
 

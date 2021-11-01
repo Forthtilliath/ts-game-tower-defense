@@ -11,18 +11,18 @@ const TypeMonster = {
 };
 export default class Monster {
     constructor({ id, name, life, movement, damages, flying, gold, type }) {
-        this.id = id;
-        this.name = name;
-        this.life = life;
-        this.movement = movement;
-        this.flying = flying;
-        this.gold = gold;
-        this.damages = damages;
-        this.type = type;
-        this.element = this.createElement();
-        this.route = [];
-        this.wave = undefined;
-        this.container = document.querySelector('#monsters');
+        this._id = id;
+        this._name = name;
+        this._life = life;
+        this._movement = movement;
+        this._flying = flying;
+        this._gold = gold;
+        this._damages = damages;
+        this._type = type;
+        this._element = this.createElement();
+        this._route = [];
+        this._wave = undefined;
+        this._container = document.querySelector('#monsters');
     }
     createElement() {
         const div = document.createElement('div');
@@ -32,38 +32,38 @@ export default class Monster {
     createEvents() {
     }
     initialPosition() {
-        const rectTile = this.wave.map.arrTiles[this.route[0]].element.getBoundingClientRect();
+        const rectTile = this._wave.map._arrTiles[this._route[0]].element.getBoundingClientRect();
         const style = {
             left: rectTile.x + 'px',
             top: rectTile.y + 'px',
             width: rectTile.width + 'px',
             height: rectTile.height + 'px',
         };
-        Object.assign(this.element.style, style);
-        this.container.appendChild(this.element);
+        Object.assign(this._element.style, style);
+        this._container.appendChild(this._element);
         this.createEvents();
     }
     setPosition() {
-        const rect = this.element.getBoundingClientRect();
-        this.element.style.setProperty('top', rect.y + 5 + 'px');
+        const rect = this._element.getBoundingClientRect();
+        this._element.style.setProperty('top', rect.y + 5 + 'px');
         if (rect.y > 666) {
-            C.LOG_WAVE && console.log('Vague', this.wave.waveNumber, 'Disparition du monstre', this);
-            this.wave.arrMonstersInMap = this.wave.arrMonstersInMap.filter((monster) => monster.element !== this.element);
-            this.element.remove();
-            if (!(this.wave.arrMonstersInMap.length + this.wave.arrPopMonsters.length)) {
-                this.wave.map.currentWaves = this.wave.map.currentWaves.filter((wave) => wave !== this.wave);
-                C.LOG_WAVE && console.log('Vague', this.wave.waveNumber, 'terminée !');
-                if (this.wave.map.finished) {
-                    this.wave.map.game.stop();
+            C.LOG_WAVE && console.log('Vague', this._wave.waveNumber, 'Disparition du monstre', this);
+            this._wave.arrMonstersInMap = this._wave.arrMonstersInMap.filter((monster) => monster._element !== this._element);
+            this._element.remove();
+            if (!(this._wave.arrMonstersInMap.length + this._wave.arrPopMonsters.length)) {
+                this._wave.map.currentWaves = this._wave.map.currentWaves.filter((wave) => wave !== this._wave);
+                C.LOG_WAVE && console.log('Vague', this._wave.waveNumber, 'terminée !');
+                if (this._wave.map.finished) {
+                    this._wave.map._game.setPlaying();
                 }
             }
         }
     }
     setRoute(route) {
-        this.route = route;
+        this._route = route;
     }
     setWave(wave) {
-        this.wave = wave;
+        this._wave = wave;
     }
     updateStates(timestamp) {
         this.setPosition();
