@@ -1,11 +1,17 @@
+import { EmptyObject, LogStyles } from './../constants.js';
 export default class Json {
-    private _data?: TJson;
-    private _map?: TJsonMap;
+    private _data: TJson;
+    private _map: TJsonMap;
     private _wave?: TJsonWave;
-    private _tiles?: number[];
-    private _routes?: number[][];
+    private _tiles: number[];
+    private _routes: number[][];
 
-    private constructor() {}
+    private constructor() {
+        this._data = EmptyObject.json;
+        this._map = this._data.maps[0];
+        this._tiles = EmptyObject.tiles;
+        this._routes = [];
+    }
 
     public static async Load(url: string) {
         const json = new Json();
@@ -21,40 +27,45 @@ export default class Json {
         return this._data;
     }
 
-    public get player()  {
-        return this._data?.player;
+    public get player() {
+        return this._data.player;
     }
 
-    /** Met à jour la map pour récupérer plus facilement les cases et les routes */ 
+    /** Met à jour la map pour récupérer plus facilement les cases et les routes */
     public setMap(i: number) {
-        this._map = this._data?.maps[i];
-        this._tiles = this._map?.tiles.flatMap((x) => x);
-        this._routes = this._map?.routes;
+        this._map = this._data.maps[i];
+        if (this._map) {
+            this._tiles = this._map.tiles.flatMap((x) => x);
+            this._routes = this._map.routes;
+        } else {
+            console.error(`%cL'index ${i} n'existe pas sur le tableau des maps !`, LogStyles.red);
+        }
     }
 
     public getMap(i?: number) {
         // Si un index de map a été passé en param, on renvoit la map demandée
-        if (typeof i === 'number') return this._data?.maps[i];
+        if (typeof i === 'number') return this._data.maps[i];
 
         // Renvoit la map en cours
         return this._map;
     }
 
     public get turrets() {
-        return this._data?.turrets;
+        return this._data.turrets;
     }
 
     public get monsters() {
-        return this._data?.monsters;
+        return this._data.monsters;
     }
 
     public set wave(i: number) {
-        this._wave = this._data?.waves[i];
+        // this._wave = this._data?.waves?.[i];
+        this._wave = this._data.waves[i];
     }
 
     public getWave(i?: number) {
         // Si un index de vague a été passé en param, on renvoit la vague demandée
-        if (typeof i === 'number') return this._data?.waves[i];
+        if (typeof i === 'number') return this._data.waves[i];
 
         // Renvoit la vague en cours
         return this._wave;
@@ -69,7 +80,7 @@ export default class Json {
     }
 
     public get nbWaves() {
-        return this._map?.waves.length;
+        return this._map.waves.length;
     }
 }
 

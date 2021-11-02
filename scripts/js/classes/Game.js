@@ -1,5 +1,4 @@
 var _a;
-import utils from '../utils.js';
 import Interface from './Interface.js';
 import Json from './Json.js';
 import Map from './Map.js';
@@ -28,17 +27,10 @@ export default class Game {
         this._isPlaying ? this.play() : this.stop();
     }
     loadMap(mapId) {
-        if (!this._datas)
+        if (!this._json)
             return;
-        this.json?.setMap(mapId);
-        this._currentMap = new Map({
-            tiles: this._datas.maps[mapId].tiles.flatMap((x) => x),
-            nbTiles: this._datas.maps[mapId].nbTiles,
-            waves: utils.getContentByIds(this._datas.maps[mapId].waves, this._datas.waves),
-            jsonMonsters: this._datas.monsters,
-            jsonMapRoutes: this._datas.maps[mapId].routes,
-            game: this,
-        });
+        this._json.setMap(mapId);
+        this._currentMap = new Map(this);
         this._currentMap.generateDom();
     }
     play() {

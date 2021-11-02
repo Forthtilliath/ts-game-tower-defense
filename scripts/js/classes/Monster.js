@@ -51,9 +51,9 @@ export default class Monster {
             this._wave.arrMonstersInMap = this._wave.arrMonstersInMap.filter((monster) => monster._element !== this._element);
             this._element.remove();
             if (!(this._wave.arrMonstersInMap.length + this._wave.arrPopMonsters.length)) {
-                this._wave.map.currentWaves = this._wave.map.currentWaves.filter((wave) => wave !== this._wave);
+                this._wave.map._currentWaves = this._wave.map._currentWaves.filter((wave) => wave !== this._wave);
                 C.LOG_WAVE && console.log('Vague', this._wave.waveNumber, 'terminée !');
-                if (this._wave.map.finished) {
+                if (this._wave.map._finished) {
                     this._wave.map._game.setPlaying();
                 }
             }

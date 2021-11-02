@@ -1,7 +1,7 @@
 import utils, { $ } from '../utils.js';
 import Tile from './Tile.js';
 import Wave from './Wave.js';
-import C from '../constants.js';
+import C, { EmptyObject } from '../constants.js';
 import Game from './Game.js';
 
 /**
@@ -18,7 +18,7 @@ export default class Map {
     /** Nombre de cases en X et Y */
     private _nbTiles: { x: number; y: number };
     /** Tableau contenant toutes les cases */
-    public _arrTiles: any[];
+    public _arrTiles: Tile[];
     /** Tableau des routes de la map (valeurs brut du json) */
     private _jsonMapRoutes: number[][];
     /** Tableau des monstres (valeurs brut du json) */
@@ -37,21 +37,48 @@ export default class Map {
      *      on chargera 2 fois les données de la wave 0 plutot que de réutiliser celles déjà récupérées.
      * Tableau waves[idMap] = Wave
      */
-    public currentWaves: Wave[];
+    public _currentWaves: Wave[];
     /** Contient l'état du jeu */
-    public finished: boolean;
+    public _finished: boolean;
 
-    constructor({ tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }: TMap) {
+    constructor(game: Game) {
         this._game = game;
         this._element = $('#map') as HTMLDivElement;
-        this._nbTiles = nbTiles;
-        this._arrTiles = tiles.map((type, index) => new Tile({ type, index, map: this }));
-        this._jsonMapRoutes = jsonMapRoutes;
-        this._jsonMonsters = jsonMonsters;
+        if (game.json) {
+            this._nbTiles = game.json.getMap().nbTiles;
+            this._jsonMapRoutes = game.json.routes;
+            this._jsonMonsters = game.json.monsters;
+            this._waves = utils.getContentByIds(game.json.getMap().waves, game.json.data.waves);
+        } else {
+            this._nbTiles = EmptyObject.map.nbTiles;
+            this._jsonMapRoutes = EmptyObject.map.routes;
+            this._jsonMonsters = [];
+            this._waves = [];
+        }
+        this._arrTiles = this.generateArrayOfTiles();
         this._currentWaveIndex = -1;
-        this._waves = waves;
-        this.currentWaves = [];
-        this.finished = false;
+        this._currentWaves = [];
+        this._finished = false;
+    }
+    // constructor({ tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }: TMap) {
+    //     this._game = game;
+    //     this._element = $('#map') as HTMLDivElement;
+    //     this._nbTiles = nbTiles;
+    //     this._arrTiles = tiles.map((type, index) => new Tile({ type, index, map: this }));
+    //     this._jsonMapRoutes = jsonMapRoutes;
+    //     this._jsonMonsters = jsonMonsters;
+    //     this._currentWaveIndex = -1;
+    //     this._waves = waves;
+    //     this.currentWaves = [];
+    //     this.finished = false;
+    // }
+
+    generateArrayOfTiles() {
+        if (!this._game.json) return [];
+
+        const mergedArray = this._game.json.tiles.flatMap((x: any) => x);
+        const tilesArray = mergedArray.map((type, index) => new Tile({ type, index, map: this }));
+        return tilesArray;
     }
 
     /** Génère une nouvelle vague à partir de l'index de la vague courante */
@@ -68,14 +95,14 @@ export default class Map {
 
     /** Passe à la vague suivante */
     nextWave() {
-        if (this.finished) return;
+        if (this._finished) return;
 
         if (this._currentWaveIndex < this._waves.length - 1) {
             this._currentWaveIndex++;
-            this.currentWaves.push(this.generateWave());
+            this._currentWaves.push(this.generateWave());
             this.createEvents();
         } else {
-            this.finished = true;
+            this._finished = true;
         }
     }
 
@@ -111,12 +138,12 @@ export default class Map {
 
     /** Boucle le tableau des vagues de monstres actuellement sur la carte */
     waveIteration(fn: (wave: Wave) => void) {
-        this.currentWaves.forEach(fn);
+        this._currentWaves.forEach(fn);
     }
 
     // TODO Delete later
     // Juste pour les tests (pour avoir un truc à afficher avec console.log)
     waveIteration2(fn: (wave: Wave) => void) {
-        return this.currentWaves.map(fn);
+        return this._currentWaves.map(fn);
     }
 }

@@ -1,19 +1,34 @@
 import utils, { $ } from '../utils.js';
 import Tile from './Tile.js';
 import Wave from './Wave.js';
-import C from '../constants.js';
+import C, { EmptyObject } from '../constants.js';
 export default class Map {
-    constructor({ tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }) {
+    constructor(game) {
         this._game = game;
         this._element = $('#map');
-        this._nbTiles = nbTiles;
-        this._arrTiles = tiles.map((type, index) => new Tile({ type, index, map: this }));
-        this._jsonMapRoutes = jsonMapRoutes;
-        this._jsonMonsters = jsonMonsters;
+        if (game.json) {
+            this._nbTiles = game.json.getMap().nbTiles;
+            this._jsonMapRoutes = game.json.routes;
+            this._jsonMonsters = game.json.monsters;
+            this._waves = utils.getContentByIds(game.json.getMap().waves, game.json.data.waves);
+        }
+        else {
+            this._nbTiles = EmptyObject.map.nbTiles;
+            this._jsonMapRoutes = EmptyObject.map.routes;
+            this._jsonMonsters = [];
+            this._waves = [];
+        }
+        this._arrTiles = this.generateArrayOfTiles();
         this._currentWaveIndex = -1;
-        this._waves = waves;
-        this.currentWaves = [];
-        this.finished = false;
+        this._currentWaves = [];
+        this._finished = false;
+    }
+    generateArrayOfTiles() {
+        if (!this._game.json)
+            return [];
+        const mergedArray = this._game.json.tiles.flatMap((x) => x);
+        const tilesArray = mergedArray.map((type, index) => new Tile({ type, index, map: this }));
+        return tilesArray;
     }
     generateWave() {
         C.LOG_WAVE && console.log('Génération de la vague', this._currentWaveIndex);
@@ -25,15 +40,15 @@ export default class Map {
         });
     }
     nextWave() {
-        if (this.finished)
+        if (this._finished)
             return;
         if (this._currentWaveIndex < this._waves.length - 1) {
             this._currentWaveIndex++;
-            this.currentWaves.push(this.generateWave());
+            this._currentWaves.push(this.generateWave());
             this.createEvents();
         }
         else {
-            this.finished = true;
+            this._finished = true;
         }
     }
     generateDom() {
@@ -52,9 +67,9 @@ export default class Map {
         this.waveIteration((wave) => wave.updateStates(timestamp));
     }
     waveIteration(fn) {
-        this.currentWaves.forEach(fn);
+        this._currentWaves.forEach(fn);
     }
     waveIteration2(fn) {
-        return this.currentWaves.map(fn);
+        return this._currentWaves.map(fn);
     }
 }
