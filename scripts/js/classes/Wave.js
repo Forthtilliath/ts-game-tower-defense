@@ -2,14 +2,17 @@ import Monster from './Monster.js';
 import utils from '../utils.js';
 import C from '../constants.js';
 export default class Wave {
-    constructor({ id, monsters, gold, difficulty, jsonMonsters, map, waveNumber }) {
+    constructor({ map }) {
         this.map = map;
-        this.waveNumber = waveNumber;
-        this.id = id;
-        this.jsonWaveMonsters = monsters;
-        this.jsonMonsters = jsonMonsters;
-        this.gold = gold;
-        this.difficulty = difficulty;
+        this.waveNumber = map.currentWaveIndex;
+        const wave = map.game.json.getWave(this.waveNumber);
+        if (wave) {
+            this.id = wave.id;
+            this.monsters = wave.monsters;
+            this.gold = wave.gold;
+            this.id = wave.id;
+        }
+        this.jsonMonsters = map.game.json.monsters;
         this.arrPopMonsters = this.generatePopMonsters();
         C.LOG_WAVE && console.log(this.arrPopMonsters);
         this.arrMonstersInMap = [];
@@ -17,11 +20,13 @@ export default class Wave {
         this.timeout = 0;
     }
     generatePopMonsters() {
-        return (this.jsonWaveMonsters
-            .reduce((arr, monster) => [
+        if (!this.monsters)
+            return [];
+        return (this.monsters.reduce((arr, monster) => [
             ...arr,
             ...Array.from({ length: monster.quantity }, () => new Monster(utils.getContentById(monster.idMonster, this.jsonMonsters))),
-        ], []));
+        ], [])
+            .reverse());
     }
     createEvents() {
         this.popMonster();

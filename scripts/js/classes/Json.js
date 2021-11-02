@@ -44,6 +44,11 @@ export default class Json {
     }
     setWave(i) {
         this._wave = this.data.waves[i];
+        if (this._wave) {
+        }
+        else {
+            console.error(`%cL'index ${i} n'existe pas sur le tableau des waves !`, LogStyles.error);
+        }
     }
     getWave(i) {
         if (typeof i === 'number')

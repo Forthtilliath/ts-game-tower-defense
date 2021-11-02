@@ -38,15 +38,15 @@ type TWave = {
     monsters: Monster[];
     gold: number;
     difficulty: number;
-    readonly jsonMonsters: object[];
-    map: Map;
+    readonly jsonMonsters: TJsonMonster[];
+    map: typeof Map;
     waveNumber: number;
 };
 
-type TWaveMonster = {
-    idMonster: number;
-    quantity: number;
-};
+// type TWaveMonster = {
+//     idMonster: number;
+//     quantity: number;
+// };
 
 type TJsonPlayer = {
     startGold: number;
@@ -79,9 +79,14 @@ type TJsonMonster = {
     type: number;
 };
 
+type TJsonWaveMonster = {
+    idMonster: number;
+    quantity: number;
+}
+
 type TJsonWave = {
     id: number;
-    monsters: { idMonster: number; quantity: number }[];
+    monsters: TJsonWaveMonster[];
     difficulty: number;
     gold: number;
 };

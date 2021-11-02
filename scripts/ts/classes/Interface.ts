@@ -52,18 +52,21 @@ export default class Interface {
         this.handleValues();
     }
 
+    /** Met à jour le montant d'or du joueur */
     public setGold(gold: number) {
         console.log('setGold', this._playerGold, gold);
         this.anim(this._playerGoldElement, this._playerGold, this._playerGold + gold);
         this._playerGold += gold;
     }
 
+    /** Met à jour le nombre de vie du joueur */
     public setLife(life: number) {
         console.log('setLife', this._playerLife, life);
         this._playerLife += life;
         this._playerLifeElement.innerText = this._playerLife.toString();
     }
 
+    /** Met à jour le numéro de la vague en cours */
     public setWave(wave: number) {
         console.log('setWave', this._waveNumber, wave);
         this._waveNumber += wave;

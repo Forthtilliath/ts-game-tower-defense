@@ -2,7 +2,7 @@ import Tile from './Tile.js';
 import Wave from './Wave.js';
 import Game from './Game.js';
 export default class Map {
-    _game: Game;
+    private _game;
     private _element;
     private _nbTiles;
     _arrTiles: Tile[];
@@ -10,9 +10,15 @@ export default class Map {
     private _jsonMonsters;
     private _currentWaveIndex;
     private _waves;
-    _currentWaves: Wave[];
-    _finished: boolean;
+    private _currentWaves;
+    private _finished;
     constructor(game: Game);
+    get game(): Game;
+    get currentWaves(): Wave[];
+    set currentWaves(waves: Wave[]);
+    get finished(): boolean;
+    get waves(): object[];
+    get currentWaveIndex(): number;
     generateArrayOfTiles(): Tile[];
     generateWave(): Wave;
     nextWave(): void;

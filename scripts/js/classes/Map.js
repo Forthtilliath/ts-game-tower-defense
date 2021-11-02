@@ -15,6 +15,24 @@ export default class Map {
         this._currentWaves = [];
         this._finished = false;
     }
+    get game() {
+        return this._game;
+    }
+    get currentWaves() {
+        return this._currentWaves;
+    }
+    set currentWaves(waves) {
+        this._currentWaves = waves;
+    }
+    get finished() {
+        return this._finished;
+    }
+    get waves() {
+        return this._waves;
+    }
+    get currentWaveIndex() {
+        return this._currentWaveIndex;
+    }
     generateArrayOfTiles() {
         if (!this._game.json)
             return [];
@@ -24,12 +42,7 @@ export default class Map {
     }
     generateWave() {
         C.LOG_WAVE && console.log('Génération de la vague', this._currentWaveIndex);
-        return new Wave({
-            ...this._waves[this._currentWaveIndex],
-            jsonMonsters: this._jsonMonsters,
-            map: this,
-            waveNumber: this._currentWaveIndex,
-        });
+        return new Wave({ map: this });
     }
     nextWave() {
         if (this._finished)

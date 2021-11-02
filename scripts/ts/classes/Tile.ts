@@ -83,15 +83,16 @@ export default class Tile {
             // Met à jour l'or du joueur
             this.setPlayerGold(-turretCost);
 
-            // 
+            // Reset l'élément
             this.removeEvents();
             this.removeClasses();
+            // Personnifie l'élément
             this._type = TYPE_TURRET;
             C.TEXTCONTENT_TILE && (this._element.textContent = this.getContent().toString());
             this.addClasses();
             this.createEvents();
         } else {
-            console.log("%cOr insuffisant !", "color:red;");
+            console.log('%cOr insuffisant !', 'color:red;');
         }
     }
 
@@ -115,7 +116,6 @@ export default class Tile {
 
     /** Retire la classe CSS en rapport avec le type de case */
     removeClasses() {
-        // this.element.classList.remove(...arrTypeClasses);
         this._element.classList.remove(arrTypeClasses[this._type]);
     }
 
@@ -126,11 +126,11 @@ export default class Tile {
 
     /** Récupère le montant d'or du joueur */
     getPlayerGold() {
-        return this._map._game.interface.playerGold;
+        return this._map.game.interface.playerGold;
     }
 
     /** Récupère le montant d'or du joueur */
     setPlayerGold(transaction: number) {
-        this._map._game.interface.setGold(transaction);
+        this._map.game.interface.setGold(transaction);
     }
 }

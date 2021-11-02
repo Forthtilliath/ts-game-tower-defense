@@ -62,7 +62,7 @@ export default class Tile {
             this.createEvents();
         }
         else {
-            console.log("%cOr insuffisant !", "color:red;");
+            console.log('%cOr insuffisant !', 'color:red;');
         }
     }
     createEventTower() {
@@ -81,9 +81,9 @@ export default class Tile {
         return this._index;
     }
     getPlayerGold() {
-        return this._map._game.interface.playerGold;
+        return this._map.game.interface.playerGold;
     }
     setPlayerGold(transaction) {
-        this._map._game.interface.setGold(transaction);
+        this._map.game.interface.setGold(transaction);
     }
 }

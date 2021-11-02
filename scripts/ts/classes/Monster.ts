@@ -131,13 +131,12 @@ export default class Monster {
             // On vérifie qu'il ne reste pas des monstre sur le carte ainsi qu'à apparaitre
             if (!(this._wave!.arrMonstersInMap.length + this._wave!.arrPopMonsters.length)) {
                 // Retire la vague du tableau
-                this._wave!.map._currentWaves = this._wave!.map._currentWaves.filter((wave) => wave !== this._wave);
+                this._wave!.map.currentWaves = this._wave!.map.currentWaves.filter((wave) => wave !== this._wave);
                 C.LOG_WAVE && console.log('Vague', this._wave!.waveNumber, 'terminée !');
 
                 // Si c'était la dernière vague de la map, on termine le jeu
-                if (this._wave!.map._finished) {
-                    // this.wave!.map.game.stop();
-                    this._wave!.map._game.setPlaying();
+                if (this._wave!.map.finished) {
+                    this._wave!.map.game.setPlaying(false);
                 }
             }
         }

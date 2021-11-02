@@ -12,7 +12,7 @@ import Game from './Game.js';
  * + createEvents() : Génère les évènements de la map
  */
 export default class Map {
-    public _game: Game;
+    private _game: Game;
     /** Element dans le DOM */
     private _element: HTMLDivElement;
     /** Nombre de cases en X et Y */
@@ -30,16 +30,16 @@ export default class Map {
     /************************************
      * Tableau contenant l'ensemble des vagues présentes sur la map
      *
-     * A chaque nouvelle vague, celle-ci est ajouté dans ce tableau. Dès le dernière monstre de la
+     * A chaque nouvelle vague, celle-ci est ajoutée dans ce tableau. Dès le dernier monstre de la
      * vague sortie de la map, la vague est supprimée du tableau.
      *
      * NOTE A améliorer plus tard, car si le tableau waves vaut [0, 1, 0],
      *      on chargera 2 fois les données de la wave 0 plutot que de réutiliser celles déjà récupérées.
      * Tableau waves[idMap] = Wave
      */
-    public _currentWaves: Wave[];
+    private _currentWaves: Wave[];
     /** Contient l'état du jeu */
-    public _finished: boolean;
+    private _finished: boolean;
 
     constructor(game: Game) {
         this._game = game;
@@ -54,6 +54,33 @@ export default class Map {
         this._finished = false;
     }
 
+    public get game() {
+        return this._game;
+    }
+
+    public get currentWaves() {
+        return this._currentWaves;
+    }
+
+    public set currentWaves(waves: Wave[]) {
+        this._currentWaves = waves;
+    }
+
+    public get finished() {
+        return this._finished;
+    }
+
+    public get waves() {
+        return this._waves;
+    }
+
+    public get currentWaveIndex() {
+        return this._currentWaveIndex;
+    }
+
+    /**
+     * Transforme le tableau des types cases de la map en un tableau de Tile.
+     */
     generateArrayOfTiles() {
         if (!this._game.json) return [];
 
@@ -66,12 +93,13 @@ export default class Map {
     generateWave(): Wave {
         C.LOG_WAVE && console.log('Génération de la vague', this._currentWaveIndex);
         // NOTE modifier map par routes ?
-        return new Wave({
-            ...this._waves[this._currentWaveIndex],
-            jsonMonsters: this._jsonMonsters,
-            map: this,
-            waveNumber: this._currentWaveIndex,
-        } as TWave);
+        // return new Wave({
+            // ...this._waves[this._currentWaveIndex],
+        //     jsonMonsters: this._jsonMonsters,
+        //     map: this,
+        //     waveNumber: this._currentWaveIndex,
+        // } as TWave);
+        return new Wave({map: this})
     }
 
     /** Passe à la vague suivante */

@@ -3,16 +3,18 @@ import Map from './Map.js';
 export default class Wave {
     map: Map;
     waveNumber: number;
-    id: number;
-    jsonWaveMonsters: TWaveMonster[];
-    jsonMonsters: object[];
-    gold: number;
-    difficulty: number;
+    id?: number;
+    monsters?: TJsonWaveMonster[];
+    difficulty?: number;
+    gold?: number;
+    jsonMonsters: TJsonMonster[];
     arrPopMonsters: Monster[];
     arrMonstersInMap: Monster[];
     delaiBeforeNextWave: number;
     timeout: number;
-    constructor({ id, monsters, gold, difficulty, jsonMonsters, map, waveNumber }: TWave);
+    constructor({ map }: {
+        map: Map;
+    });
     generatePopMonsters(): Monster[];
     createEvents(): void;
     popMonster(): void;

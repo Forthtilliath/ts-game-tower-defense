@@ -11,79 +11,56 @@ import Map from './Map.js';
  * + launchWave() : Démarre la vague.
  */
 export default class Wave {
+    /** Permet d'accéder facilement à l'instance de Map pour la route */
     map: Map;
+    /** Numéro de la vague */
     waveNumber: number;
-    id: number;
-    jsonWaveMonsters: TWaveMonster[];
-    jsonMonsters: object[];
-    gold: number;
-    difficulty: number;
+    /** Id de la vague */
+    id?: number;
+    /** Tableau des monstres de la vague */
+    monsters?: TJsonWaveMonster[];
+    /** Difficulté de la vague. Plus la valeur est élevée, plus la vague est complexe. */
+    difficulty?: number;
+    /** Or gagné par le joueur à la fin de la vague */
+    gold?: number;
+    /** Tableau des objects des monstres */
+    jsonMonsters: TJsonMonster[];
+    /** Contient l'ensemble des monstres de la vague. */
     arrPopMonsters: Monster[];
+    /** Tableau contenant l'ensemble des monstres présent sur la map */
     arrMonstersInMap: Monster[];
+    /** Délai avant le lancement automatique de la vague suivante */
     delaiBeforeNextWave: number;
+    /**
+     * Enregistre le setTimeout de la vague suivante. Cela permet d'éviter
+     * de lancer plusieurs setTimeout entre la fin d'une vague et le début
+     * de la suivante.
+     */
     timeout: number;
 
-    constructor({ id, monsters, gold, difficulty, jsonMonsters, map, waveNumber }: TWave) {
-        // Permet d'accéder facilement à l'instance de Map pour la route
+    // constructor({ id, monsters, gold, difficulty, jsonMonsters, map, waveNumber }: TWave) {
+    constructor({ map }: {map:Map}) {
         this.map = map;
 
-        // Numéro de la vague
-        this.waveNumber = waveNumber;
+        this.waveNumber = map.currentWaveIndex;
 
-        /******************************
-         * Id de la vague
-         * @type number
-         */
-        this.id = id;
+        // Récupère les données de la vague dans le json
+        const wave = map.game.json.getWave(this.waveNumber);
+        if (wave) {
+            this.id = wave.id;
+            this.monsters = wave.monsters;
+            this.gold = wave.gold;
+            this.id = wave.id;
+        }
 
-        /******************************
-         * Tableau des objects des monstres de la vague
-         * NOTE : A voir si on garde ca par la suite, ca celà sert uniquement à générer
-         * le tableau d'apparition des monstres
-         * @type {{ idMonster: number; quantity: number }[]}
-         */
-        this.jsonWaveMonsters = monsters;
+        this.jsonMonsters = map.game.json.monsters;
 
-        /******************************
-         * Tableau des objects des monstres
-         * NOTE : A voir si on garde ca par la suite, ca celà sert uniquement à générer
-         * le tableau d'apparition des monstres
-         * @type object[]
-         */
-        this.jsonMonsters = jsonMonsters;
-
-        /******************************
-         * Or gagné par le joueur à la fin de la vague
-         * @type number
-         */
-        this.gold = gold;
-
-        /******************************
-         * Difficulté de la vague. Plus la valeur est élevée, plus la vague est complexe.
-         * @type number
-         */
-        this.difficulty = difficulty;
-
-        /**
-         * Contient l'ensemble des monstres de la vague.
-         * @type Monster[]
-         */
         this.arrPopMonsters = this.generatePopMonsters();
         C.LOG_WAVE && console.log(this.arrPopMonsters);
 
-        /**
-         * Tableau contenant l'ensemble des monstres présent sur la map
-         * @type Monster[]
-         */
         this.arrMonstersInMap = [];
 
         this.delaiBeforeNextWave = C.WAVE_DELAI * 1000;
-
-        /**
-         * Enregistre le setTimeout de la vague suivante. Cela permet d'éviter
-         * de lancer plusieurs setTimeout entre la fin d'une vague et le début
-         * de la suivante.
-         */
         this.timeout = 0;
     }
 
@@ -100,11 +77,12 @@ export default class Wave {
      * Ca simplifiera son utilisation.
      */
     generatePopMonsters(): Monster[] {
+        if (!this.monsters) return [];
+
+        // Fusionne les différents monstres en un seul tableau
         return (
-            this.jsonWaveMonsters
-                // Fusionne les différents monstres en un seul tableau
-                .reduce(
-                    (arr: Monster[], monster: TWaveMonster) => [
+            this.monsters.reduce(
+                    (arr: Monster[], monster: TJsonWaveMonster) => [
                         ...arr,
                         ...Array.from(
                             { length: monster.quantity },
@@ -114,28 +92,8 @@ export default class Wave {
                     [],
                 )
             // On inverse l'ordre du tableau
-            // .reverse()
+            .reverse()
         );
-        // return (
-        //     this.jsonWaveMonsters
-        //         // Fusionne les différents monstres en un seul tableau
-        //         .reduce(
-        //             (arr, monster) => [
-        //                 // Tableau qui sera retourné à la fin
-        //                 ...arr,
-        //                 // Génère un tableau de n éléments
-        //                 ...Array.from(
-        //                     // n éléments correspondant au nombre de monstres dans la vague
-        //                     { length: monster.quantity },
-        //                     // On récupère l'objet du monstre à partir de son id
-        //                     () => new Monster(utils.getContentById(monster.idMonster, this.jsonMonsters)),
-        //                 ),
-        //             ],
-        //             [],
-        //         )
-        //         // On inverse l'ordre du tableau
-        //         .reverse()
-        // );
     }
 
     /**
