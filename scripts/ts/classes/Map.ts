@@ -1,7 +1,7 @@
 import utils, { $ } from '../utils.js';
 import Tile from './Tile.js';
 import Wave from './Wave.js';
-import C, { EmptyObject } from '../constants.js';
+import C from '../constants.js';
 import Game from './Game.js';
 
 /**
@@ -44,34 +44,15 @@ export default class Map {
     constructor(game: Game) {
         this._game = game;
         this._element = $('#map') as HTMLDivElement;
-        if (game.json) {
-            this._nbTiles = game.json.getMap().nbTiles;
-            this._jsonMapRoutes = game.json.routes;
-            this._jsonMonsters = game.json.monsters;
-            this._waves = utils.getContentByIds(game.json.getMap().waves, game.json.data.waves);
-        } else {
-            this._nbTiles = EmptyObject.map.nbTiles;
-            this._jsonMapRoutes = EmptyObject.map.routes;
-            this._jsonMonsters = [];
-            this._waves = [];
-        }
+        this._nbTiles = game.json.getMap().nbTiles;
+        this._jsonMapRoutes = game.json.routes;
+        this._jsonMonsters = game.json.monsters;
+        this._waves = utils.getContentByIds(game.json.getMap().waves, game.json.data.waves);
         this._arrTiles = this.generateArrayOfTiles();
         this._currentWaveIndex = -1;
         this._currentWaves = [];
         this._finished = false;
     }
-    // constructor({ tiles, nbTiles, waves, jsonMonsters, jsonMapRoutes, game }: TMap) {
-    //     this._game = game;
-    //     this._element = $('#map') as HTMLDivElement;
-    //     this._nbTiles = nbTiles;
-    //     this._arrTiles = tiles.map((type, index) => new Tile({ type, index, map: this }));
-    //     this._jsonMapRoutes = jsonMapRoutes;
-    //     this._jsonMonsters = jsonMonsters;
-    //     this._currentWaveIndex = -1;
-    //     this._waves = waves;
-    //     this.currentWaves = [];
-    //     this.finished = false;
-    // }
 
     generateArrayOfTiles() {
         if (!this._game.json) return [];
@@ -118,6 +99,8 @@ export default class Map {
             this._element,
             this._arrTiles.map((tile) => tile.element),
         );
+
+        return this;
     }
 
     /** Retourne les routes de la map */

@@ -1,4 +1,3 @@
-import { EmptyObject } from '../constants.js';
 import utils, { $ } from '../utils.js';
 import Interface from './Interface.js';
 import Json from './Json.js';
@@ -41,7 +40,7 @@ export default class Game {
     }
 
     public get json() {
-        return this._json;
+        return this._json!;
     }
 
     /** Met à jour le contenu de l'interface */
@@ -76,17 +75,7 @@ export default class Game {
         this._json.setMap(mapId);
 
         // Instancie la carte à partir des données du json
-        this._currentMap = new Map(this);
-        // this._currentMap = new Map({
-        //     tiles: this._datas.maps[mapId].tiles.flatMap((x: any) => x), //json
-        //     nbTiles: this._datas.maps[mapId].nbTiles, //json
-        //     waves: utils.getContentByIds(this._datas.maps[mapId].waves, this._datas.waves), //json
-        //     jsonMonsters: this._datas.monsters, //json
-        //     jsonMapRoutes: this._datas.maps[mapId].routes, //json
-        //     game: this,
-        // });
-
-        this._currentMap.generateDom();
+        this._currentMap = new Map(this).generateDom();
     }
 
     // ANIMATION

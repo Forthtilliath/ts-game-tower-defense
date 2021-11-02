@@ -1,23 +1,15 @@
 import utils, { $ } from '../utils.js';
 import Tile from './Tile.js';
 import Wave from './Wave.js';
-import C, { EmptyObject } from '../constants.js';
+import C from '../constants.js';
 export default class Map {
     constructor(game) {
         this._game = game;
         this._element = $('#map');
-        if (game.json) {
-            this._nbTiles = game.json.getMap().nbTiles;
-            this._jsonMapRoutes = game.json.routes;
-            this._jsonMonsters = game.json.monsters;
-            this._waves = utils.getContentByIds(game.json.getMap().waves, game.json.data.waves);
-        }
-        else {
-            this._nbTiles = EmptyObject.map.nbTiles;
-            this._jsonMapRoutes = EmptyObject.map.routes;
-            this._jsonMonsters = [];
-            this._waves = [];
-        }
+        this._nbTiles = game.json.getMap().nbTiles;
+        this._jsonMapRoutes = game.json.routes;
+        this._jsonMonsters = game.json.monsters;
+        this._waves = utils.getContentByIds(game.json.getMap().waves, game.json.data.waves);
         this._arrTiles = this.generateArrayOfTiles();
         this._currentWaveIndex = -1;
         this._currentWaves = [];
@@ -56,6 +48,7 @@ export default class Map {
         this._element.style.setProperty('--nbRows', this._nbTiles.y.toString());
         this._element.style.setProperty('--tile-size', C.TILE_DEFAULT_SIZE);
         utils.appendChilds(this._element, this._arrTiles.map((tile) => tile.element));
+        return this;
     }
     getRoutes() {
         return this._jsonMapRoutes;

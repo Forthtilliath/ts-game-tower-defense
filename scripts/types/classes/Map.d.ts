@@ -16,7 +16,7 @@ export default class Map {
     generateArrayOfTiles(): Tile[];
     generateWave(): Wave;
     nextWave(): void;
-    generateDom(): void;
+    generateDom(): this;
     getRoutes(): number[][];
     createEvents(): void;
     updateStates(timestamp: number): void;

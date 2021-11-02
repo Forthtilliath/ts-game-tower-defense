@@ -1,6 +1,6 @@
 export default class Json {
-    private _data;
-    private _map;
+    private _data?;
+    private _map?;
     private _wave?;
     private _tiles;
     private _routes;
@@ -12,7 +12,7 @@ export default class Json {
     getMap(i?: number): TJsonMap;
     get turrets(): TJsonTurret[];
     get monsters(): TJsonMonster[];
-    set wave(i: number);
+    setWave(i: number): void;
     getWave(i?: number): TJsonWave | undefined;
     get tiles(): number[];
     get routes(): number[][];

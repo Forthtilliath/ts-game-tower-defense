@@ -11,7 +11,7 @@ export default class Game {
     private constructor();
     get isPlaying(): boolean;
     get interface(): Interface;
-    get json(): Json | undefined;
+    get json(): Json;
     updateInterface(): void;
     setPlaying(newState?: boolean): void;
     static CreateAsync: () => Promise<Game>;

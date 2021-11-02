@@ -30,8 +30,7 @@ export default class Game {
         if (!this._json)
             return;
         this._json.setMap(mapId);
-        this._currentMap = new Map(this);
-        this._currentMap.generateDom();
+        this._currentMap = new Map(this).generateDom();
     }
     play() {
         if (!this._currentMap)
