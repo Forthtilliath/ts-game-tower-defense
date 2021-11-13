@@ -1,55 +1,80 @@
-import Monster from './Monster.js';
-import utils from '../utils.js';
 import C from '../constants.js';
+import utils from '../utils.js';
+import Monster from './Monster.js';
 export default class Wave {
-    constructor({ map }) {
-        this.map = map;
-        this.waveNumber = map.currentWaveIndex;
-        const wave = map.game.json.getWave(this.waveNumber);
+    constructor(map) {
+        this._map = map;
+        this._waveNumber = map.currentWaveIndex;
+        this._createdAt = map.game.timestamp;
+        const wave = map.getWave();
         if (wave) {
-            this.id = wave.id;
-            this.monsters = wave.monsters;
-            this.gold = wave.gold;
-            this.id = wave.id;
+            this._id = wave.id;
+            this._monsters = wave.monsters;
+            this._difficulty = wave.difficulty;
+            this._gold = wave.gold;
         }
-        this.jsonMonsters = map.game.json.monsters;
-        this.arrPopMonsters = this.generatePopMonsters();
-        C.LOG_WAVE && console.log(this.arrPopMonsters);
-        this.arrMonstersInMap = [];
-        this.delaiBeforeNextWave = C.WAVE_DELAI * 1000;
-        this.timeout = 0;
+        this._monstersToPop = this.generateMonstersToPop();
+        C.LOG_WAVE && console.log(this._monstersToPop);
+        this._monstersInMap = [];
+        this._finished = false;
     }
-    generatePopMonsters() {
-        if (!this.monsters)
+    get map() {
+        return this._map;
+    }
+    get waveNumber() {
+        return this._waveNumber;
+    }
+    get monstersInMap() {
+        return this._monstersInMap;
+    }
+    get monstersToPop() {
+        return this._monstersToPop;
+    }
+    isFinished() {
+        return this._finished;
+    }
+    generateMonstersToPop() {
+        if (!this._monsters)
             return [];
-        return (this.monsters.reduce((arr, monster) => [
+        return this._monsters
+            .reduce((arr, monster) => [
             ...arr,
-            ...Array.from({ length: monster.quantity }, () => new Monster(utils.getContentById(monster.idMonster, this.jsonMonsters))),
+            ...Array.from({ length: monster.quantity }, () => new Monster({
+                ...utils.getContentById(monster.idMonster, this._map.game.json.monsters),
+                wave: this,
+                routeIndex: 0,
+            })),
         ], [])
-            .reverse());
-    }
-    createEvents() {
-        this.popMonster();
+            .reverse();
     }
     popMonster() {
-        if (this.arrPopMonsters.length) {
-            const monster = this.arrPopMonsters.pop();
-            C.LOG_WAVE && console.log('Vague', this.id, 'Apparition du monstre', monster);
-            monster?.setRoute(this.map.getRoutes()[0]);
-            monster?.setWave(this);
-            monster?.initialPosition();
-            monster && this.arrMonstersInMap.push(monster);
-        }
-        else if (!this.timeout) {
-            this.timeout = setTimeout(() => {
-                this.map.nextWave();
-            }, this.delaiBeforeNextWave);
+        const monster = this._monstersToPop.pop();
+        if (monster) {
+            C.LOG_WAVE && console.log('Vague', this._waveNumber, 'Apparition du monstre');
+            monster.initialPosition();
+            this._monstersInMap.push(monster);
         }
     }
+    removeMonsterOfMap(element) {
+        this._monstersInMap = this._monstersInMap.filter((monster) => monster.element !== element);
+        element.remove();
+        C.LOG_WAVE && console.log('Monstres restant', this.monstersRemaining());
+        if (!this.monstersRemaining()) {
+            C.LOG_WAVE && console.log('Vague', this.waveNumber, 'terminée !');
+            this._finished = true;
+        }
+    }
+    monstersRemaining() {
+        return this._monstersInMap.length + this._monstersToPop.length;
+    }
     updateStates(timestamp) {
-        if (timestamp % (C.MONSTER_DELAI * 60) === 0) {
+        this._monstersInMap.forEach((monster) => monster.updateStates(timestamp));
+        if (this._finished) {
+            this._map.waveFinished(this);
+            return;
+        }
+        if ((timestamp - this._createdAt) % (C.MONSTER_DELAI * 60) === 0) {
             this.popMonster();
         }
-        this.arrMonstersInMap.forEach((monster) => monster.updateStates(timestamp));
     }
 }

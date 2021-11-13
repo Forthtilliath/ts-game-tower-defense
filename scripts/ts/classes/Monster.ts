@@ -1,42 +1,39 @@
+import C, { LogStyles } from '../constants.js';
 import Wave from './Wave.js';
-import C from '../constants.js';
-
-const TYPE_COMMON: number = 0;
-const TYPE_RARE: number = 1;
-const TYPE_ELITE: number = 2;
-const TYPE_BOSS: number = 3;
-
-const TypeMonster: ObjectType = {
-    [TYPE_COMMON]: 'Common',
-    [TYPE_RARE]: 'Rare',
-    [TYPE_ELITE]: 'Elite',
-    [TYPE_BOSS]: 'Boss',
-};
 
 /**
- * La classe Monstre gère le monstre en lui-même.
- *
- * + createElement() : Génère une div avec la classe tile ainsi que la classe correspondant à son type
- * + createEvents() : Génère les évènements du monstre (apparition, déplacement, disparition)
- * + startMove() : Met en place le monstre sur la carte
- * + setRoute() : Met à jour la route du monstre
- * + setWave() : Met à jour la vague à laquelle le monstre appartient
+ * La classe Monstre génère l'élément dans le DOM et controle son déplacement.
  */
 export default class Monster {
+    /** Element HTML du monstre */
+    private _element: HTMLElement;
+    /** Id du monstre */
     private _id: number;
+    /** Nom du monstre */
     private _name: string;
+    /** Points de vie du monstre */
     private _life: number;
+    /** Vitesse de déplacement du monstre (1 correspond à 1 case) */
     private _movement: number;
+    /** Monstre volant ou pas */
     private _flying: boolean;
+    /** Or gagné en tuant le monstre */
     private _gold: number;
+    /** Dégâts subit par le nexus si le monstre l'atteint */
     private _damages: number;
+    /** Type du monstre */
     private _type: number;
-    private _element: HTMLDivElement;
+    /** Route que le monstre va suivre pour atteindre le nexus */
     private _route: number[];
-    private _wave: Wave | undefined;
-    private _container: any;
+    /** Vague à laquelle appartient le monstre */
+    private _wave: Wave;
+    /** Element où tous les monstres sont dans le DOM */
+    private _container: HTMLElement | null;
+    /** Target du monstre, correspond à l'index du tableau de route */
+    private _target: number;
 
-    constructor({ id, name, life, movement, damages, flying, gold, type }: TMonster) {
+    // prettier-ignore
+    constructor({ id, name, life, movement, damages, flying, gold, type, wave, routeIndex }: TMonster & {wave:Wave}) {
         // Données du json
         this._id = id;
         this._name = name;
@@ -47,52 +44,42 @@ export default class Monster {
         this._damages = damages;
         this._type = type;
 
-        /**
-         * Element du DOM lié à la case
-         * @type {HTMLDivElement}
-         */
-        this._element = this.createElement();
-
-        /**
-         * Route que le monstre va suivre
-         * @type number[]
-         */
-        this._route = [];
-
-        /**
-         * Wave à laquelle le monstre appartient
-         * @type Wave
-         */
-        this._wave = undefined;
-
-        /**
-         * Container des monsters
-         * @type {HTMLDivElement}
-         */
         this._container = document.querySelector('#monsters');
+        this._element = this.createElement();
+        this._wave = wave;
+        this._route = this._wave.map.game.json.routes[routeIndex];
+        this._target = -1;
     }
 
-    /**
-     * Génère une div avec la classe tile ainsi que la classe correspondant à son type
-     * @returns {HTMLDivElement}
-     */
-    createElement() {
+    //=======================
+    // GETTERS ET SETTERS
+    //=======================
+
+    public get element() {
+        return this._element;
+    }
+
+    //=======================
+    // METHODES
+    //=======================
+
+    /** Génère une div avec la classe tile ainsi que la classe correspondant à son type */
+    private createElement() {
         const div = document.createElement('div');
         div.classList.add('monster');
 
         return div;
     }
 
-    createEvents() {
-        // Mouvement du monstre
-    }
+    /** Met en place le monstre sur la carte */
+    public initialPosition() {
+        if (!this._container) {
+            console.error(`%cErreur, le containeur pour les monstres n'a pas été trouvé !`, LogStyles.error);
+            return;
+        }
 
-    /**
-     * Met en place le monstre sur la carte
-     */
-    initialPosition() {
-        // Récupère la position et la taille de la carte de départ de la vague
-        const rectTile = this._wave!.map._arrTiles[this._route[0]].element.getBoundingClientRect();
+        // Récupère la position et la taille de la case de départ de la route
+        const rectTile = this._wave.map.tiles[this._route[0]].element.getBoundingClientRect();
 
         // Met à jour la position et la taille de la div du monstre
         // WARNING : La div n'est pas redimensionnée avec la page
@@ -106,57 +93,30 @@ export default class Monster {
 
         // Ajoute le monstre au body afin de pouvoir le déplacer plus facilement d'une case à une autre
         this._container.appendChild(this._element);
-
-        // Génère les évènements pour le faire se déplacer sur la route
-        this.createEvents();
     }
 
-    /**
-     * Met à jour la position du monstre
-     */
-    setPosition() {
+    /** Déplace le monstre sur la carte */
+    private move() {
         const rect = this._element.getBoundingClientRect();
         this._element.style.setProperty('top', rect.y + 5 + 'px');
 
-        // Si le monstre a atteint la sortie
-        if (rect.y > 666) {
-            C.LOG_WAVE && console.log('Vague', this._wave!.waveNumber, 'Disparition du monstre', this);
-            // Retire le monstre du tableau
-            this._wave!.arrMonstersInMap = this._wave!.arrMonstersInMap.filter(
-                (monster) => monster._element !== this._element,
-            );
-            // Retire le monstre du dom
-            this._element.remove();
+        if (this.isTargetReached(rect)) {
+            C.LOG_WAVE && console.log('Vague', this._wave.waveNumber, 'Disparition du monstre');
 
-            // On vérifie qu'il ne reste pas des monstre sur le carte ainsi qu'à apparaitre
-            if (!(this._wave!.arrMonstersInMap.length + this._wave!.arrPopMonsters.length)) {
-                // Retire la vague du tableau
-                this._wave!.map.currentWaves = this._wave!.map.currentWaves.filter((wave) => wave !== this._wave);
-                C.LOG_WAVE && console.log('Vague', this._wave!.waveNumber, 'terminée !');
-
-                // Si c'était la dernière vague de la map, on termine le jeu
-                if (this._wave!.map.finished) {
-                    this._wave!.map.game.setPlaying(false);
-                }
-            }
+            this._wave.removeMonsterOfMap(this._element);
         }
     }
 
-    /**
-     * Met à jour la route du monstre
-     */
-    setRoute(route: number[]) {
-        this._route = route;
+    /** Vérifie si le monster a atteint sa cible */
+    private isTargetReached(rect: DOMRect) {
+        return rect.y > 666;
     }
 
-    /**
-     * Met à jour la vague à laquelle le monstre appartient
-     */
-    setWave(wave: Wave) {
-        this._wave = wave;
-    }
+    //=======================
+    // ANIMATION
+    //=======================
 
-    updateStates(timestamp: number) {
-        this.setPosition();
+    public updateStates(timestamp: number) {
+        this.move();
     }
 }

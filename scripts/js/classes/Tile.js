@@ -1,4 +1,4 @@
-import C from '../constants.js';
+import C, { LogStyles } from '../constants.js';
 const TYPE_DECOR = 0;
 const TYPE_START = 1;
 const TYPE_ROUTE = 2;
@@ -15,15 +15,23 @@ const arrTypeClasses = {
 };
 export default class Tile {
     constructor({ type, index, map }) {
-        this._index = index;
-        this._type = type;
+        this._type = TYPE_DECOR;
         this._map = map;
+        this._index = index;
         this._element = this.createElement();
-        this.addClasses();
-        this.createEvents();
+        this.setElement(type);
     }
     get element() {
         return this._element;
+    }
+    getContent() {
+        return this._index;
+    }
+    getPlayerGold() {
+        return this._map.game.interface.playerGold;
+    }
+    setPlayerGold(transaction) {
+        this._map.game.interface.setGold(transaction);
     }
     createElement() {
         const div = document.createElement('div');
@@ -54,15 +62,11 @@ export default class Tile {
         console.log('constructible', this._element, 'cost', turretCost);
         if (this.getPlayerGold() >= turretCost) {
             this.setPlayerGold(-turretCost);
-            this.removeEvents();
-            this.removeClasses();
-            this._type = TYPE_TURRET;
-            C.TEXTCONTENT_TILE && (this._element.textContent = this.getContent().toString());
-            this.addClasses();
-            this.createEvents();
+            this.resetElement();
+            this.setElement(TYPE_TURRET);
         }
         else {
-            console.log('%cOr insuffisant !', 'color:red;');
+            console.log('%cOr insuffisant !', LogStyles.error);
         }
     }
     createEventTower() {
@@ -77,13 +81,14 @@ export default class Tile {
     removeClasses() {
         this._element.classList.remove(arrTypeClasses[this._type]);
     }
-    getContent() {
-        return this._index;
+    resetElement() {
+        this.removeEvents();
+        this.removeClasses();
     }
-    getPlayerGold() {
-        return this._map.game.interface.playerGold;
-    }
-    setPlayerGold(transaction) {
-        this._map.game.interface.setGold(transaction);
+    setElement(type) {
+        this._type = type;
+        C.TEXTCONTENT_TILE && (this._element.textContent = this.getContent().toString());
+        this.addClasses();
+        this.createEvents();
     }
 }

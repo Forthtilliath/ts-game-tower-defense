@@ -8,7 +8,7 @@ export default class Interface {
         this._playerLife = player?.startLife ?? 0;
         this._waveNumber = 0;
         this._waveMax = waveMax?.toString() ?? 'XX';
-        this.handleValues();
+        this.setDisplay();
     }
     get playerGold() {
         return this._playerGold;
@@ -16,16 +16,16 @@ export default class Interface {
     get wave() {
         return `${this._waveNumber} / ${this._waveMax}`;
     }
-    handleValues() {
-        this._playerGoldElement.innerText = this._playerGold.toString();
-        this._playerLifeElement.innerText = this._playerLife.toString();
-        this._waveNumberElement.innerText = this.wave;
-    }
     set(player, waveMax) {
         this._playerGold = player?.startGold ?? 0;
         this._playerLife = player?.startLife ?? 0;
         this._waveMax = waveMax?.toString() ?? 'XX';
-        this.handleValues();
+        this.setDisplay();
+    }
+    setDisplay() {
+        this._playerGoldElement.innerText = this._playerGold.toString();
+        this._playerLifeElement.innerText = this._playerLife.toString();
+        this._waveNumberElement.innerText = this.wave;
     }
     setGold(gold) {
         console.log('setGold', this._playerGold, gold);
@@ -43,7 +43,8 @@ export default class Interface {
         this._waveNumberElement.innerText = this._waveNumber.toString();
     }
     anim(element, start, end) {
-        const delai = Math.floor(300 / Math.abs(start - end));
+        const duration = 300;
+        const delai = Math.floor(duration / Math.abs(start - end));
         let timer = 0;
         const inc = start > end ? -1 : 1;
         for (let current = start; current - inc !== end; current += inc) {

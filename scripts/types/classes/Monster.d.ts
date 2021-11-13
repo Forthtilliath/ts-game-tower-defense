@@ -1,5 +1,6 @@
 import Wave from './Wave.js';
 export default class Monster {
+    private _element;
     private _id;
     private _name;
     private _life;
@@ -8,16 +9,17 @@ export default class Monster {
     private _gold;
     private _damages;
     private _type;
-    private _element;
     private _route;
     private _wave;
     private _container;
-    constructor({ id, name, life, movement, damages, flying, gold, type }: TMonster);
-    createElement(): HTMLDivElement;
-    createEvents(): void;
+    private _target;
+    constructor({ id, name, life, movement, damages, flying, gold, type, wave, routeIndex }: TMonster & {
+        wave: Wave;
+    });
+    get element(): HTMLElement;
+    private createElement;
     initialPosition(): void;
-    setPosition(): void;
-    setRoute(route: number[]): void;
-    setWave(wave: Wave): void;
+    private move;
+    private isTargetReached;
     updateStates(timestamp: number): void;
 }

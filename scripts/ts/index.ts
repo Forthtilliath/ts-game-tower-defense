@@ -4,12 +4,9 @@ const btn_startWave = document.querySelector('#startWave') as HTMLElement;
 
 // GameInitialized représente le jeu avec le json contenant toutes les données chargées
 GameInitialized.then((myGame) => {
-    const mapNum = 1;
-    // Charge la map numéro 1
+    const mapNum = 0;
+    // Charge la map
     myGame.loadMap(mapNum);
-    
-    // Met à jour l'interface à partir des données du json
-    myGame.updateInterface();
 
     // Le jeu est chargé, on peut donc afficher le bouton et ajouter l'event
     btn_startWave.style.setProperty('display', 'block');
@@ -21,11 +18,3 @@ function handleGame(theGame: Game) {
     theGame.setPlaying();
     btn_startWave.textContent = theGame.isPlaying ? 'Pause' : 'Lecture';
 }
-
-/**
- * Clic sur une case pour construire une tourelle
- * Vérifie si assez d'or pour construire
- * Si assez :
- *  - construction de la tourelle
- *  - réduction gold
- */

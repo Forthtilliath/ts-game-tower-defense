@@ -1,4 +1,4 @@
-import C from '../constants.js';
+import C, { LogStyles } from '../constants.js';
 import utils from '../utils.js';
 import Map from './Map.js';
 
@@ -20,31 +20,52 @@ const arrTypeClasses: ObjectType = {
 };
 
 export default class Tile {
+    /** Map en cours */
+    private _map: Map;
     /** Index de la case dans le tableau global */
     private _index: number;
     /** Type de case */
-    private _type: number;
+    private _type: number = TYPE_DECOR;
     /** Element du DOM lié à la case */
     private _element: HTMLDivElement;
-    /** Map en cours */
-    private _map: Map;
 
-    constructor({ type, index, map }: TTile) {
-        this._index = index;
-        this._type = type;
+    public constructor({ type, index, map }: TTile) {
         this._map = map;
+        this._index = index;
         this._element = this.createElement();
 
-        this.addClasses();
-        this.createEvents();
+        this.setElement(type);
     }
+
+    //=======================
+    // GETTERS ET SETTERS
+    //=======================
 
     public get element() {
         return this._element;
     }
 
+    /** Contenu à mettre dans la div */
+    private getContent() {
+        return this._index;
+    }
+
+    /** Récupère le montant d'or du joueur */
+    private getPlayerGold() {
+        return this._map.game.interface.playerGold;
+    }
+
+    /** Met à jour le montant d'or du joueur */
+    private setPlayerGold(transaction: number) {
+        this._map.game.interface.setGold(transaction);
+    }
+
+    //=======================
+    // METHODES
+    //=======================
+
     /** Génère une div avec la classe tile ainsi que la classe correspondant à son type */
-    createElement(): HTMLDivElement {
+    private createElement(): HTMLDivElement {
         const div = document.createElement('div');
         div.classList.add('tile');
         C.TEXTCONTENT_TILE && (div.textContent = this.getContent().toString());
@@ -53,7 +74,7 @@ export default class Tile {
     }
 
     /** Génère les events de la case en fonction du type de case que c'est */
-    createEvents() {
+    private createEvents() {
         switch (this._type) {
             case TYPE_DECOR:
                 break;
@@ -76,23 +97,17 @@ export default class Tile {
      * Event lorsque l'on clique sur une case constructible
      * Actuellement, cliquer sur une case constructible la transforme directement en tourelle
      */
-    createEventConstructible() {
+    private createEventConstructible() {
         const turretCost = 100;
         console.log('constructible', this._element, 'cost', turretCost);
-        if (this.getPlayerGold() >= turretCost) {
-            // Met à jour l'or du joueur
-            this.setPlayerGold(-turretCost);
 
-            // Reset l'élément
-            this.removeEvents();
-            this.removeClasses();
-            // Personnifie l'élément
-            this._type = TYPE_TURRET;
-            C.TEXTCONTENT_TILE && (this._element.textContent = this.getContent().toString());
-            this.addClasses();
-            this.createEvents();
+        // Si le joueur a assez d'or pour acheter la tourelle
+        if (this.getPlayerGold() >= turretCost) {
+            this.setPlayerGold(-turretCost);
+            this.resetElement();
+            this.setElement(TYPE_TURRET);
         } else {
-            console.log('%cOr insuffisant !', 'color:red;');
+            console.log('%cOr insuffisant !', LogStyles.error);
         }
     }
 
@@ -100,37 +115,36 @@ export default class Tile {
      * Event lorsque l'on clique sur une case tourelle
      * Actuellement, cliquer sur une case tower ne fait rien de spécial
      */
-    createEventTower() {
+    private createEventTower() {
         console.log('tourelle', this._element);
     }
 
     /** Supprime tous les events de l'éléments en faisant une copie de l'élément */
-    removeEvents() {
+    private removeEvents() {
         this._element.replaceWith((this._element = this._element.cloneNode(true) as HTMLDivElement));
     }
 
     /** Ajoute la classe CSS à la case en fonction de son type */
-    addClasses() {
+    private addClasses() {
         this._element.classList.add(arrTypeClasses[this._type]);
     }
 
     /** Retire la classe CSS en rapport avec le type de case */
-    removeClasses() {
+    private removeClasses() {
         this._element.classList.remove(arrTypeClasses[this._type]);
     }
 
-    /** Contenu à mettre dans la div */
-    getContent() {
-        return this._index;
+    /** Reset l'élément */
+    private resetElement() {
+        this.removeEvents();
+        this.removeClasses();
     }
 
-    /** Récupère le montant d'or du joueur */
-    getPlayerGold() {
-        return this._map.game.interface.playerGold;
-    }
-
-    /** Récupère le montant d'or du joueur */
-    setPlayerGold(transaction: number) {
-        this._map.game.interface.setGold(transaction);
+    /** Personnifie l'élément */
+    private setElement(type: number) {
+        this._type = type;
+        C.TEXTCONTENT_TILE && (this._element.textContent = this.getContent().toString());
+        this.addClasses();
+        this.createEvents();
     }
 }

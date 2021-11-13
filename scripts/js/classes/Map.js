@@ -1,22 +1,26 @@
 import utils, { $ } from '../utils.js';
+import C from '../constants.js';
 import Tile from './Tile.js';
 import Wave from './Wave.js';
-import C from '../constants.js';
 export default class Map {
     constructor(game) {
-        this._game = game;
         this._element = $('#map');
-        this._nbTiles = game.json.getMap().nbTiles;
-        this._jsonMapRoutes = game.json.routes;
-        this._jsonMonsters = game.json.monsters;
-        this._waves = utils.getContentByIds(game.json.getMap().waves, game.json.data.waves);
-        this._arrTiles = this.generateArrayOfTiles();
+        this._waves = [];
+        this._game = game;
+        this._tilesXY = game.json.getMap().nbTiles;
+        this._wavesId = game.json.getMap().waves;
+        this.addWaves(...this._wavesId);
         this._currentWaveIndex = -1;
         this._currentWaves = [];
-        this._finished = false;
+        this._tiles = this.generateTiles();
+        this.generateDom();
+        this.nextWave = this.nextWave.bind(this);
     }
     get game() {
         return this._game;
+    }
+    get waves() {
+        return this._waves;
     }
     get currentWaves() {
         return this._currentWaves;
@@ -24,58 +28,62 @@ export default class Map {
     set currentWaves(waves) {
         this._currentWaves = waves;
     }
-    get finished() {
-        return this._finished;
-    }
-    get waves() {
-        return this._waves;
-    }
     get currentWaveIndex() {
         return this._currentWaveIndex;
     }
-    generateArrayOfTiles() {
+    get tiles() {
+        return this._tiles;
+    }
+    getWaveId(index = this._currentWaveIndex) {
+        return this._wavesId[index];
+    }
+    getWave(waveId = this.getWaveId()) {
+        return this._waves[waveId];
+    }
+    generateTiles() {
         if (!this._game.json)
             return [];
         const mergedArray = this._game.json.tiles.flatMap((x) => x);
         const tilesArray = mergedArray.map((type, index) => new Tile({ type, index, map: this }));
         return tilesArray;
     }
-    generateWave() {
-        C.LOG_WAVE && console.log('Génération de la vague', this._currentWaveIndex);
-        return new Wave({ map: this });
-    }
-    nextWave() {
-        if (this._finished)
-            return;
-        if (this._currentWaveIndex < this._waves.length - 1) {
-            this._currentWaveIndex++;
-            this._currentWaves.push(this.generateWave());
-            this.createEvents();
-        }
-        else {
-            this._finished = true;
-        }
-    }
     generateDom() {
-        this._element.style.setProperty('--nbColumns', this._nbTiles.x.toString());
-        this._element.style.setProperty('--nbRows', this._nbTiles.y.toString());
+        this._element.style.setProperty('--nbColumns', this._tilesXY.x.toString());
+        this._element.style.setProperty('--nbRows', this._tilesXY.y.toString());
         this._element.style.setProperty('--tile-size', C.TILE_DEFAULT_SIZE);
-        utils.appendChilds(this._element, this._arrTiles.map((tile) => tile.element));
+        utils.appendChilds(this._element, this._tiles.map((tile) => tile.element));
         return this;
     }
-    getRoutes() {
-        return this._jsonMapRoutes;
+    addWaves(...wavesId) {
+        [...new Set(wavesId)].forEach((id) => (this._waves[id] = utils.getContentById(id, this.game.json.data.waves)));
     }
-    createEvents() {
-        this.waveIteration((wave) => wave.createEvents());
+    nextWave() {
+        this._currentWaveIndex++;
+        this._currentWaves.push(this.createWave());
     }
-    updateStates(timestamp) {
-        this.waveIteration((wave) => wave.updateStates(timestamp));
+    createWave() {
+        C.LOG_WAVE && console.log('Génération de la vague', this._currentWaveIndex);
+        return new Wave(this);
+    }
+    removeWave(waveToDelete) {
+        this._currentWaves = this._currentWaves.filter((wave) => wave !== waveToDelete);
     }
     waveIteration(fn) {
         this._currentWaves.forEach(fn);
     }
-    waveIteration2(fn) {
-        return this._currentWaves.map(fn);
+    isLastWave() {
+        return this._waves.length === this._currentWaveIndex + 1;
+    }
+    waveFinished(wave) {
+        this.removeWave(wave);
+        if (this.isLastWave()) {
+            this.game.setPlaying(false);
+        }
+        else {
+            this.game.setTimestampNextWave();
+        }
+    }
+    updateStates(timestamp) {
+        this.waveIteration((wave) => wave.updateStates(timestamp));
     }
 }

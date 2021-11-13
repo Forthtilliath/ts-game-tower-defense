@@ -1,7 +1,9 @@
 {
     "compilerOptions": {
+        "experimentalDecorators": true,
         /* Visit https://aka.ms/tsconfig.json to read more about this file */
         "target": "es2021",
+        "module": "ES2020",
         "outDir": "./scripts/js",
         "noEmitOnError": true,
         "strict": true,

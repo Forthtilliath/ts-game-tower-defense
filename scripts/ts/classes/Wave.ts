@@ -1,68 +1,83 @@
-import Monster from './Monster.js';
-import utils from '../utils.js';
 import C from '../constants.js';
+import utils from '../utils.js';
 import Map from './Map.js';
+import Monster from './Monster.js';
 
 /**
- * La classe Wave gère l'ensemble de la vague.
- *
- * + generatePopMonsters() : Génère un tableau contenant l'ensemble des monstres de la vague.
- * + createEvents() : Génère les évènements de la vague
- * + launchWave() : Démarre la vague.
+ * La classe Wave génère les monstres de la vague, leurs apparitions et disparitions
+ * de la carte.
  */
 export default class Wave {
     /** Permet d'accéder facilement à l'instance de Map pour la route */
-    map: Map;
+    private _map: Map;
     /** Numéro de la vague */
-    waveNumber: number;
+    private _waveNumber: number;
     /** Id de la vague */
-    id?: number;
+    private _id?: number;
     /** Tableau des monstres de la vague */
-    monsters?: TJsonWaveMonster[];
+    private _monsters?: TJsonWaveMonster[];
     /** Difficulté de la vague. Plus la valeur est élevée, plus la vague est complexe. */
-    difficulty?: number;
+    private _difficulty?: number;
     /** Or gagné par le joueur à la fin de la vague */
-    gold?: number;
-    /** Tableau des objects des monstres */
-    jsonMonsters: TJsonMonster[];
+    private _gold?: number;
     /** Contient l'ensemble des monstres de la vague. */
-    arrPopMonsters: Monster[];
+    private _monstersToPop: Monster[];
     /** Tableau contenant l'ensemble des monstres présent sur la map */
-    arrMonstersInMap: Monster[];
-    /** Délai avant le lancement automatique de la vague suivante */
-    delaiBeforeNextWave: number;
-    /**
-     * Enregistre le setTimeout de la vague suivante. Cela permet d'éviter
-     * de lancer plusieurs setTimeout entre la fin d'une vague et le début
-     * de la suivante.
-     */
-    timeout: number;
+    private _monstersInMap: Monster[];
+    /** Timestamp création wave */
+    private _createdAt: number;
+    /** Vague terminée ou pas */
+    private _finished: boolean;
 
-    // constructor({ id, monsters, gold, difficulty, jsonMonsters, map, waveNumber }: TWave) {
-    constructor({ map }: {map:Map}) {
-        this.map = map;
+    constructor(map: Map) {
+        this._map = map;
 
-        this.waveNumber = map.currentWaveIndex;
+        this._waveNumber = map.currentWaveIndex;
+        this._createdAt = map.game.timestamp;
 
         // Récupère les données de la vague dans le json
-        const wave = map.game.json.getWave(this.waveNumber);
+        const wave = map.getWave();
         if (wave) {
-            this.id = wave.id;
-            this.monsters = wave.monsters;
-            this.gold = wave.gold;
-            this.id = wave.id;
+            this._id = wave.id;
+            this._monsters = wave.monsters;
+            this._difficulty = wave.difficulty;
+            this._gold = wave.gold;
         }
 
-        this.jsonMonsters = map.game.json.monsters;
+        this._monstersToPop = this.generateMonstersToPop();
+        C.LOG_WAVE && console.log(this._monstersToPop);
 
-        this.arrPopMonsters = this.generatePopMonsters();
-        C.LOG_WAVE && console.log(this.arrPopMonsters);
-
-        this.arrMonstersInMap = [];
-
-        this.delaiBeforeNextWave = C.WAVE_DELAI * 1000;
-        this.timeout = 0;
+        this._monstersInMap = [];
+        this._finished = false;
     }
+
+    //=======================
+    // GETTERS ET SETTERS
+    //=======================
+
+    public get map() {
+        return this._map;
+    }
+
+    public get waveNumber() {
+        return this._waveNumber;
+    }
+
+    public get monstersInMap() {
+        return this._monstersInMap;
+    }
+
+    public get monstersToPop() {
+        return this._monstersToPop;
+    }
+
+    public isFinished() {
+        return this._finished;
+    }
+
+    //=======================
+    // METHODES
+    //=======================
 
     /**
      * Génère un tableau contenant l'ensemble des monstres de la vague. Si le monstre A doit
@@ -72,71 +87,94 @@ export default class Wave {
      * classe Monster, ce qui permet d'instancier un Monster directement à partir des données
      * du json !
      *
+     * On y ajoute l'élément Wave afin de donner accès à toutes les données de l'app.
+     *
      * L'utilisation du reverse sur le tableau permet que lorsque l'on ajoutera les monstres
      * sur la map, on pourra supprimer à partir du dernier élément plutot que le premier.
      * Ca simplifiera son utilisation.
      */
-    generatePopMonsters(): Monster[] {
-        if (!this.monsters) return [];
+    private generateMonstersToPop(): Monster[] {
+        if (!this._monsters) return [];
 
-        // Fusionne les différents monstres en un seul tableau
-        return (
-            this.monsters.reduce(
-                    (arr: Monster[], monster: TJsonWaveMonster) => [
-                        ...arr,
-                        ...Array.from(
-                            { length: monster.quantity },
-                            () => new Monster(utils.getContentById(monster.idMonster, this.jsonMonsters)),
-                        ),
-                    ],
-                    [],
-                )
-            // On inverse l'ordre du tableau
-            .reverse()
-        );
+        return this._monsters
+            .reduce(
+                (arr: Monster[], monster: TJsonWaveMonster) => [
+                    ...arr,
+                    ...Array.from(
+                        { length: monster.quantity },
+                        () =>
+                            new Monster({
+                                ...utils.getContentById(monster.idMonster, this._map.game.json.monsters),
+                                wave: this,
+                                // Index de la route que le monstre va suivre
+                                // NOTE : Faire en sorte que cette donnée vienne du json par la suite
+                                routeIndex: 0,
+                            }),
+                    ),
+                ],
+                [],
+            )
+            .reverse();
     }
 
-    /**
-     * Génère les évènements de la vague
-     */
-    createEvents() {
-        this.popMonster();
-    }
-
-    /**
-     * Démarre la vague
-     */
-    popMonster() {
+    /** Fait apparaitre un monstre sur la carte */
+    private popMonster() {
+        // Récupère le premier monstre du tableau d'apparition
+        const monster = this._monstersToPop.pop();
         // S'il reste des monstres de la vague à lancer sur la carte
-        if (this.arrPopMonsters.length) {
-            // Récupère le premier monstre du tableau d'apparition
-            const monster = this.arrPopMonsters.pop();
+        if (monster) {
+            C.LOG_WAVE && console.log('Vague', this._waveNumber, 'Apparition du monstre');
 
-            C.LOG_WAVE && console.log('Vague', this.id, 'Apparition du monstre', monster);
-            // Met à jour la route du monstre
-            // NOTE : Actuellement, on considère qu'il n'y a qu'une route
-            // Pas la suite, il faudra soit faire une wave par route, soit répartir
-            // les monstres à travers les différentes routes
-            monster?.setRoute(this.map.getRoutes()[0]);
-            // Met à jour la wave du monstre (permet d'avoir accès aux infos de la
-            // wave et de la map directement dans le monstre)
-            monster?.setWave(this);
-            // Démarre son mouvement en le placant sur la carte
-            monster?.initialPosition();
+            monster.initialPosition();
 
-            monster && this.arrMonstersInMap.push(monster);
-        } else if (!this.timeout) {
-            // Wave terminée !
-            this.timeout = setTimeout(() => {
-                this.map.nextWave();
-            }, this.delaiBeforeNextWave);
+            // Le monstre est à présent sur la carte
+            this._monstersInMap.push(monster);
         }
     }
 
-    updateStates(timestamp: number) {
-        if (timestamp % (C.MONSTER_DELAI * 60) === 0) {
+    /** Retire le monstre du tableau des monstres présent sur la carte */
+    public removeMonsterOfMap(element: HTMLElement) {
+        this._monstersInMap = this._monstersInMap.filter((monster) => monster.element !== element);
+        element.remove();
+
+        C.LOG_WAVE && console.log('Monstres restant', this.monstersRemaining());
+        if (!this.monstersRemaining()) {
+            C.LOG_WAVE && console.log('Vague', this.waveNumber, 'terminée !');
+            this._finished = true;
+        }
+    }
+
+    /** Compte le nombre de monstres restant : monstres sur la carte + monstres en attente */
+    public monstersRemaining() {
+        return this._monstersInMap.length + this._monstersToPop.length;
+    }
+
+    // private getRoute(index: number) {
+    //     return this._map.game.json.routes[index];
+    // }
+
+    //=======================
+    // ANIMATION
+    //=======================
+
+    /**
+     * Gère l'apparition des monstres et leur déplacement sur la carte
+     *
+     * Cet update gère aussi le lancement de la vague suivante. Si celle ci
+     * est la dernière, cela lancement la fin de la partie.
+     */
+    public updateStates(timestamp: number) {
+        // Déplace tous les monstres de la vague
+        this._monstersInMap.forEach((monster) => monster.updateStates(timestamp));
+
+        // Si le mouvement d'un monstre a provoqué la fin de la vague
+        if (this._finished) {
+            this._map.waveFinished(this);
+            return;
+        }
+
+        if ((timestamp - this._createdAt) % (C.MONSTER_DELAI * 60) === 0) {
             this.popMonster();
         }
-        this.arrMonstersInMap.forEach((monster) => monster.updateStates(timestamp));
     }
 }

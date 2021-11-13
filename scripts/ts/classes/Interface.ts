@@ -1,12 +1,19 @@
 import { $ } from '../utils.js';
 
 export default class Interface {
+    /** Element affichant le montant d'or */
     private _playerGoldElement: HTMLElement;
+    /** Element affichange le nombre de vies */
     private _playerLifeElement: HTMLElement;
+    /** Element affichange le statut des vagues */
     private _waveNumberElement: HTMLElement;
+    /** Montant d'or */
     private _playerGold: number;
+    /** Nombre de vies */
     private _playerLife: number;
+    /** Numéro de la vague en cours */
     private _waveNumber: number;
+    /** Nombre maximum de vagues de la carte en cours */
     private _waveMax: string;
 
     constructor(player?: TJsonPlayer, waveMax?: number) {
@@ -18,9 +25,12 @@ export default class Interface {
         this._waveNumber = 0;
         this._waveMax = waveMax?.toString() ?? 'XX';
 
-        this.handleValues();
-        // this.handleEvents();
+        this.setDisplay();
     }
+
+    //=======================
+    // GETTERS ET SETTERS
+    //=======================
 
     public get playerGold() {
         return this._playerGold;
@@ -30,26 +40,24 @@ export default class Interface {
         return `${this._waveNumber} / ${this._waveMax}`;
     }
 
-    private handleValues() {
-        this._playerGoldElement.innerText = this._playerGold.toString();
-        this._playerLifeElement.innerText = this._playerLife.toString();
-        this._waveNumberElement.innerText = this.wave;
-    }
+    //=======================
+    // METHODES
+    //=======================
 
-    // private handleEvents() {
-    //     window.addEventListener('changeinterface', (e: any) => {
-    //         e.detail.gold && this.setGold(e.detail.gold);
-    //         e.detail.life && this.setLife(e.detail.life);
-    //         e.detail.wave && this.setWave(e.detail.wave);
-    //     });
-    // }
-
+    /** Met à jour les valeurs */
     public set(player?: TJsonPlayer, waveMax?: number) {
         this._playerGold = player?.startGold ?? 0;
         this._playerLife = player?.startLife ?? 0;
         this._waveMax = waveMax?.toString() ?? 'XX';
 
-        this.handleValues();
+        this.setDisplay();
+    }
+
+    /** Met à jour l'affichage */
+    private setDisplay() {
+        this._playerGoldElement.innerText = this._playerGold.toString();
+        this._playerLifeElement.innerText = this._playerLife.toString();
+        this._waveNumberElement.innerText = this.wave;
     }
 
     /** Met à jour le montant d'or du joueur */
@@ -75,7 +83,8 @@ export default class Interface {
 
     /** Anime la modification de valeur d'un champ pour une durée de 300ms */
     private anim(element: HTMLElement, start: number, end: number) {
-        const delai = Math.floor(300 / Math.abs(start - end));
+        const duration = 300;
+        const delai = Math.floor(duration / Math.abs(start - end));
         let timer = 0;
         const inc = start > end ? -1 : 1;
         for (let current = start; current - inc !== end; current+=inc) {

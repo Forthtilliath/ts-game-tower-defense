@@ -6,6 +6,6 @@ declare const _default: Readonly<{
     TEXTCONTENT_TILE: boolean;
 }>;
 export default _default;
-export declare const LogStyles: {
+export declare const LogStyles: Readonly<{
     error: string;
-};
+}>;

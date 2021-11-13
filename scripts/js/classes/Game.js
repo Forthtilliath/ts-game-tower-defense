@@ -1,4 +1,6 @@
 var _a;
+import { LogStyles } from '../constants.js';
+import C from '../constants.js';
 import Interface from './Interface.js';
 import Json from './Json.js';
 import Map from './Map.js';
@@ -8,6 +10,8 @@ export default class Game {
         this._timestamp = 0;
         this._animFrameId = 0;
         this._interface = new Interface();
+        this._timestampNextWave = 0;
+        this._delaiBetweenWaves = C.WAVE_DELAI * 60;
         return this;
     }
     get isPlaying() {
@@ -19,42 +23,53 @@ export default class Game {
     get json() {
         return this._json;
     }
-    updateInterface() {
-        return this._interface.set(this._json?.player, this._json?.nbWaves);
+    get timestamp() {
+        return this._timestamp;
     }
-    setPlaying(newState = !this._isPlaying) {
-        this._isPlaying = newState;
-        this._isPlaying ? this.play() : this.stop();
+    get delaiBetweenWaves() {
+        return this._delaiBetweenWaves;
+    }
+    setTimestampNextWave() {
+        return this._timestampNextWave = this._timestamp + this._delaiBetweenWaves;
     }
     loadMap(mapId) {
         if (!this._json)
             return;
         this._json.setMap(mapId);
-        this._currentMap = new Map(this).generateDom();
+        this._currentMap = new Map(this);
+        this.updateInterface();
+    }
+    updateInterface() {
+        return this._interface.set(this.json.player, this.json.nbWaves);
+    }
+    setPlaying(newState = !this._isPlaying) {
+        console.log('change state');
+        this._isPlaying = newState;
+        this._isPlaying ? this.play() : this.stop();
     }
     play() {
-        if (!this._currentMap)
-            return;
-        this._currentMap.nextWave();
         this.update();
     }
     stop() {
         cancelAnimationFrame(this._animFrameId);
     }
-    updateStates() {
-        this._currentMap.updateStates(this._timestamp);
-    }
     update() {
+        if (!this._currentMap) {
+            console.error(`%cErreur, pas de carte chargée !`, LogStyles.error);
+            return;
+        }
         this._animFrameId = requestAnimationFrame(() => this.update());
+        if (this._timestamp === this._timestampNextWave) {
+            this._currentMap.nextWave();
+        }
         this._timestamp += 1;
-        this.updateStates();
+        this._currentMap.updateStates(this._timestamp);
     }
 }
 _a = Game;
 Game.CreateAsync = async () => {
     const theGame = new Game();
     theGame._json = await Json.Load('../json/datas.json');
-    theGame._datas = theGame._json.data;
     return theGame;
 };
 export const GameInitialized = Game.CreateAsync();

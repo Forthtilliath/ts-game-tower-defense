@@ -1,61 +1,81 @@
 import utils, { $ } from '../utils.js';
-import Tile from './Tile.js';
-import Wave from './Wave.js';
 import C from '../constants.js';
 import Game from './Game.js';
+import Tile from './Tile.js';
+import Wave from './Wave.js';
 
 /**
- * La classe Map gère tout ce qui est en rapport avec la map.
+ * La classe Map est l'un des plus importantes de l'application.
  *
- * + generateDom() : Génère le DOM en fonction du tableau des cases
- * + getRoutes() : Retourne les routes de la map
- * + createEvents() : Génère les évènements de la map
+ * Au début du programme, elle va générer l'ensemble des cases du jeu.
+ *
+ * Pas la suite, elle va gérer les vagues : de leur création à leur suppression.
  */
 export default class Map {
-    private _game: Game;
     /** Element dans le DOM */
-    private _element: HTMLDivElement;
+    private _element: HTMLDivElement = $('#map') as HTMLDivElement;
+    /** Istance de Jeu */
+    private _game: Game;
     /** Nombre de cases en X et Y */
-    private _nbTiles: { x: number; y: number };
-    /** Tableau contenant toutes les cases */
-    public _arrTiles: Tile[];
-    /** Tableau des routes de la map (valeurs brut du json) */
-    private _jsonMapRoutes: number[][];
-    /** Tableau des monstres (valeurs brut du json) */
-    private _jsonMonsters: TJsonMonster[];
+    private _tilesXY: XY;
     /** Vague courante, démarre à -1 */
     private _currentWaveIndex: number;
-    /** Tableau contenant l'ensemble des vagues de la map */
-    private _waves: object[];
+    /** Tableau contenant l'ensemble des id des vagues de la map */
+    private _wavesId: number[];
+    /**
+     * Tableau contenant l'ensemble des vagues de la map
+     *
+     * Si la map contient les vagues avec les id 0 et 2, le tableau aura une vague à
+     * l'index 0 et 2.
+     *
+     * L'index 1 restera vide.
+     */
+    private _waves: TJsonWave[] = [];
+    /** Contient l'état de la carte */
+    // private _finished: boolean;
+    /** Tableau contenant toutes les cases */
+    private _tiles: Tile[];
     /************************************
      * Tableau contenant l'ensemble des vagues présentes sur la map
      *
-     * A chaque nouvelle vague, celle-ci est ajoutée dans ce tableau. Dès le dernier monstre de la
-     * vague sortie de la map, la vague est supprimée du tableau.
-     *
-     * NOTE A améliorer plus tard, car si le tableau waves vaut [0, 1, 0],
-     *      on chargera 2 fois les données de la wave 0 plutot que de réutiliser celles déjà récupérées.
-     * Tableau waves[idMap] = Wave
+     * A chaque nouvelle vague, celle-ci est ajoutée dans ce tableau. Dès le dernier
+     * monstre de la vague sortie de la map, la vague est supprimée du tableau.
      */
     private _currentWaves: Wave[];
-    /** Contient l'état du jeu */
-    private _finished: boolean;
 
-    constructor(game: Game) {
+    public constructor(game: Game) {
         this._game = game;
-        this._element = $('#map') as HTMLDivElement;
-        this._nbTiles = game.json.getMap().nbTiles;
-        this._jsonMapRoutes = game.json.routes;
-        this._jsonMonsters = game.json.monsters;
-        this._waves = utils.getContentByIds(game.json.getMap().waves, game.json.data.waves);
-        this._arrTiles = this.generateArrayOfTiles();
+        this._tilesXY = game.json.getMap().nbTiles;
+        this._wavesId = game.json.getMap().waves;
+        this.addWaves(...this._wavesId);
+
         this._currentWaveIndex = -1;
+        // this._finished = false;
         this._currentWaves = [];
-        this._finished = false;
+
+        this._tiles = this.generateTiles();
+
+        this.generateDom();
+
+        // Bind certaines méthodes pour conserver le this
+        // Utile pour setTimeout, addEventListener par exemple
+        this.nextWave = this.nextWave.bind(this);
     }
+
+    //=======================
+    // GETTERS ET SETTERS
+    //=======================
 
     public get game() {
         return this._game;
+    }
+
+    // public get finished() {
+    //     return this._finished;
+    // }
+
+    public get waves() {
+        return this._waves;
     }
 
     public get currentWaves() {
@@ -66,22 +86,28 @@ export default class Map {
         this._currentWaves = waves;
     }
 
-    public get finished() {
-        return this._finished;
-    }
-
-    public get waves() {
-        return this._waves;
-    }
-
     public get currentWaveIndex() {
         return this._currentWaveIndex;
     }
 
-    /**
-     * Transforme le tableau des types cases de la map en un tableau de Tile.
-     */
-    generateArrayOfTiles() {
+    public get tiles() {
+        return this._tiles;
+    }
+
+    public getWaveId(index: number = this._currentWaveIndex) {
+        return this._wavesId[index];
+    }
+
+    public getWave(waveId: number = this.getWaveId()): TJsonWave {
+        return this._waves[waveId];
+    }
+
+    //=======================
+    // METHODES
+    //=======================
+
+    /** Transforme le tableau des types cases de la map en un tableau de Tile */
+    private generateTiles() {
         if (!this._game.json) return [];
 
         const mergedArray = this._game.json.tiles.flatMap((x: any) => x);
@@ -89,72 +115,74 @@ export default class Map {
         return tilesArray;
     }
 
-    /** Génère une nouvelle vague à partir de l'index de la vague courante */
-    generateWave(): Wave {
-        C.LOG_WAVE && console.log('Génération de la vague', this._currentWaveIndex);
-        // NOTE modifier map par routes ?
-        // return new Wave({
-            // ...this._waves[this._currentWaveIndex],
-        //     jsonMonsters: this._jsonMonsters,
-        //     map: this,
-        //     waveNumber: this._currentWaveIndex,
-        // } as TWave);
-        return new Wave({map: this})
-    }
-
-    /** Passe à la vague suivante */
-    nextWave() {
-        if (this._finished) return;
-
-        if (this._currentWaveIndex < this._waves.length - 1) {
-            this._currentWaveIndex++;
-            this._currentWaves.push(this.generateWave());
-            this.createEvents();
-        } else {
-            this._finished = true;
-        }
-    }
-
     /** Génère le DOM en fonction du tableau des cases */
-    generateDom() {
+    private generateDom() {
         // Modifie les variables CSS pour adapter le grid en fonction du nombre de cases en X et Y
-        this._element.style.setProperty('--nbColumns', this._nbTiles.x.toString());
-        this._element.style.setProperty('--nbRows', this._nbTiles.y.toString());
+        this._element.style.setProperty('--nbColumns', this._tilesXY.x.toString());
+        this._element.style.setProperty('--nbRows', this._tilesXY.y.toString());
         this._element.style.setProperty('--tile-size', C.TILE_DEFAULT_SIZE);
 
         // Ajoute les cases dans la map
         utils.appendChilds(
             this._element,
-            this._arrTiles.map((tile) => tile.element),
+            this._tiles.map((tile) => tile.element),
         );
 
         return this;
     }
 
-    /** Retourne les routes de la map */
-    getRoutes() {
-        return this._jsonMapRoutes;
+    /** Ajoute les données json d'une vague à partir de l'id de la vague. */
+    private addWaves(...wavesId: number[]) {
+        [...new Set(wavesId)].forEach((id) => (this._waves[id] = utils.getContentById(id, this.game.json.data.waves)));
     }
 
-    /** Génère les évènements de la map */
-    createEvents() {
-        // Démarre la vague courrante
-        // this.arrWaves[this.currentWaveIndex].launchWave();
-        this.waveIteration((wave: Wave) => wave.createEvents());
+    /** Passe à la vague suivante */
+    public nextWave() {
+        this._currentWaveIndex++;
+        this._currentWaves.push(this.createWave());
     }
 
-    updateStates(timestamp: number) {
-        this.waveIteration((wave: Wave) => wave.updateStates(timestamp));
+    /** Génère une nouvelle vague à partir de l'index de la vague courante */
+    private createWave(): Wave {
+        C.LOG_WAVE && console.log('Génération de la vague', this._currentWaveIndex);
+        return new Wave(this);
+    }
+
+    /** Supprime la vague du tableau des vagues en cours */
+    private removeWave(waveToDelete: Wave) {
+        this._currentWaves = this._currentWaves.filter((wave) => wave !== waveToDelete);
     }
 
     /** Boucle le tableau des vagues de monstres actuellement sur la carte */
-    waveIteration(fn: (wave: Wave) => void) {
+    private waveIteration(fn: (wave: Wave) => void) {
         this._currentWaves.forEach(fn);
     }
 
-    // TODO Delete later
-    // Juste pour les tests (pour avoir un truc à afficher avec console.log)
-    waveIteration2(fn: (wave: Wave) => void) {
-        return this._currentWaves.map(fn);
+    /** Vérifie si la vague en cours est la dernière vague de la map */
+    private isLastWave() {
+        return this._waves.length === this._currentWaveIndex + 1;
+    }
+
+    /** Actions lorsqu'une vague est terminée */
+    public waveFinished(wave: Wave) {
+        this.removeWave(wave);
+
+        if (this.isLastWave()) {
+            this.game.setPlaying(false);
+        } else {
+            this.game.setTimestampNextWave();
+        }
+    }
+
+    //=======================
+    // ANIMATION
+    //=======================
+
+    /**
+     * Met à jour chaque vague, car même si le joueur est à la vague 2, il peut rester
+     * des monstres des vagues précédentes à faire avancer.
+     */
+    public updateStates(timestamp: number) {
+        this.waveIteration((wave: Wave) => wave.updateStates(timestamp));
     }
 }

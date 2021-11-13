@@ -9,8 +9,8 @@ export default class Interface {
     constructor(player?: TJsonPlayer, waveMax?: number);
     get playerGold(): number;
     private get wave();
-    private handleValues;
     set(player?: TJsonPlayer, waveMax?: number): void;
+    private setDisplay;
     setGold(gold: number): void;
     setLife(life: number): void;
     setWave(wave: number): void;
