@@ -12,7 +12,7 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "pretty": true,
-        "removeComments": true,
+        "removeComments": false,
         "composite": false,
         "declarationDir": "./scripts/types",
     },

@@ -9,10 +9,12 @@ export default class Json {
     private _mapIndex;
     private _waveIndex;
     private constructor();
+    /** Charge un fichier json. Charge par défaut la map 0 */
     static Load(url: string): Promise<Json>;
     get data(): TJson;
     get player(): TJsonPlayer;
     private nbTiles;
+    /** Met à jour la map pour récupérer plus facilement les cases et les routes */
     setMap(i: number): void;
     getMap(i?: number): TJsonMap;
     get turrets(): TJsonTurret[];
