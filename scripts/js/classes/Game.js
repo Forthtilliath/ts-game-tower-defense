@@ -15,9 +15,10 @@ export default class Game {
         this._isPlaying = false;
         this._timestamp = 0;
         this._animFrameId = 0;
-        this._interface = new Interface();
+        this._interface = new Interface(this);
         this._timestampNextWave = 0;
         this._delaiBetweenWaves = C.WAVE_DELAI * 60;
+        console.log(typeof this, this);
         return this;
     }
     //=======================
@@ -28,6 +29,9 @@ export default class Game {
     }
     get interface() {
         return this._interface;
+    }
+    get map() {
+        return this._currentMap;
     }
     get json() {
         return this._json;
@@ -60,7 +64,6 @@ export default class Game {
      * paramètre, l'état de jeu est basculé.
      */
     setPlaying(newState = !this._isPlaying) {
-        console.log('change state');
         this._isPlaying = newState;
         this._isPlaying ? this.play() : this.stop();
     }
@@ -75,7 +78,7 @@ export default class Game {
     }
     update() {
         if (!this._currentMap) {
-            console.error(`%cErreur, pas de carte chargée !`, LogStyles.error);
+            console.error(`%cErreur, pas de carte chargée !`, LogStyles.danger);
             return;
         }
         this._animFrameId = requestAnimationFrame(() => this.update());

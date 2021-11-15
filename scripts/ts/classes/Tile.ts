@@ -107,7 +107,7 @@ export default class Tile {
             this.resetElement();
             this.setElement(TYPE_TURRET);
         } else {
-            console.log('%cOr insuffisant !', LogStyles.error);
+            console.log('%cOr insuffisant !', LogStyles.danger);
         }
     }
 

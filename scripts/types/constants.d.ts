@@ -12,5 +12,7 @@ declare const _default: Readonly<{
 }>;
 export default _default;
 export declare const LogStyles: Readonly<{
-    error: string;
+    danger: string;
+    alert: string;
+    success: string;
 }>;

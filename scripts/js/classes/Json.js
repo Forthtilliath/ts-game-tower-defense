@@ -17,7 +17,7 @@ export default class Json {
             json.setMap(0);
         }
         catch (err) {
-            console.error(`%cErreur lors du chargement du fichier json`, LogStyles.error);
+            console.error(`%cErreur lors du chargement du fichier json`, LogStyles.danger);
         }
         return json;
     }
@@ -43,20 +43,20 @@ export default class Json {
             this._tiles = this._map.tiles.flatMap((x) => x);
             // Vérifie si les données sont corrects
             if (this._tiles.length !== this.nbTiles()) {
-                console.error(`%cErreur ! Le nombre de cases entre nbTiles et tiles ne correspond pas pour la map ${i} !`, LogStyles.error);
+                console.error(`%cErreur ! Le nombre de cases entre nbTiles et tiles ne correspond pas pour la map ${i} !`, LogStyles.danger);
             }
             if (!this._map.tiles.every((tile) => tile.length === this._tilesXY.x)) {
-                console.error(`%cErreur ! Une ligne du tableau des cases de la map ${i} ne contient pas le nombre de colonnes attendu !`, LogStyles.error);
+                console.error(`%cErreur ! Une ligne du tableau des cases de la map ${i} ne contient pas le nombre de colonnes attendu !`, LogStyles.danger);
             }
             if (!this._waves.length) {
-                console.error(`%cErreur ! Le tableau des vagues de la map ${i} est vide !`, LogStyles.error);
+                console.error(`%cErreur ! Le tableau des vagues de la map ${i} est vide !`, LogStyles.danger);
             }
             if (!this._routes.every(route => route.length)) {
-                console.error(`%cErreur ! Une route du tableau des routes de la map ${i} est vide !`, LogStyles.error);
+                console.error(`%cErreur ! Une route du tableau des routes de la map ${i} est vide !`, LogStyles.danger);
             }
         }
         else {
-            console.error(`%cErreur ! L'index ${i} n'existe pas sur le tableau des maps !`, LogStyles.error);
+            console.error(`%cErreur ! L'index ${i} n'existe pas sur le tableau des maps !`, LogStyles.danger);
         }
     }
     getMap(i) {
@@ -77,7 +77,7 @@ export default class Json {
         if (this._wave) {
         }
         else {
-            console.error(`%cL'index ${i} n'existe pas sur le tableau des waves !`, LogStyles.error);
+            console.error(`%cL'index ${i} n'existe pas sur le tableau des waves !`, LogStyles.danger);
         }
     }
     getWave(i) {

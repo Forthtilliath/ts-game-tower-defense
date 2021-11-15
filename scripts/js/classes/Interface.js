@@ -1,13 +1,16 @@
 import { $ } from '../utils.js';
 export default class Interface {
-    constructor(player, waveMax) {
+    constructor(game, player, waveMax) {
+        this._game = game;
         this._playerGoldElement = $('#playerGold');
         this._playerLifeElement = $('#playerLife');
         this._waveNumberElement = $('#waveNumber');
+        this._btnStartWaveElement = $('#startWave');
         this._playerGold = player?.startGold ?? 0;
         this._playerLife = player?.startLife ?? 0;
         this._waveNumber = 0;
         this._waveMax = waveMax?.toString() ?? 'XX';
+        this.handleGame = this.handleGame.bind(this);
         this.setDisplay();
     }
     //=======================
@@ -34,24 +37,25 @@ export default class Interface {
         this._playerGoldElement.innerText = this._playerGold.toString();
         this._playerLifeElement.innerText = this._playerLife.toString();
         this._waveNumberElement.innerText = this.wave;
+        // Le jeu est chargé, on peut donc afficher le bouton et ajouter l'event
+        this._btnStartWaveElement.style.setProperty('display', 'block');
+        this._btnStartWaveElement.addEventListener('click', this.handleGame);
     }
     /** Met à jour le montant d'or du joueur */
     setGold(gold) {
-        console.log('setGold', this._playerGold, gold);
         this.anim(this._playerGoldElement, this._playerGold, this._playerGold + gold);
         this._playerGold += gold;
     }
     /** Met à jour le nombre de vie du joueur */
     setLife(life) {
-        console.log('setLife', this._playerLife, life);
         this._playerLife += life;
         this._playerLifeElement.innerText = this._playerLife.toString();
     }
     /** Met à jour le numéro de la vague en cours */
-    setWave(wave) {
-        console.log('setWave', this._waveNumber, wave);
-        this._waveNumber += wave;
-        this._waveNumberElement.innerText = this._waveNumber.toString();
+    setWave() {
+        this._waveNumber++;
+        // this._waveNumber = this._game.map.currentWaveIndex;
+        this._waveNumberElement.innerText = this.wave;
     }
     /** Anime la modification de valeur d'un champ pour une durée de 300ms */
     anim(element, start, end) {
@@ -62,7 +66,12 @@ export default class Interface {
         for (let current = start; current - inc !== end; current += inc) {
             setTimeout(() => {
                 element.innerText = current.toString();
-            }, timer += delai);
+            }, (timer += delai));
         }
+    }
+    /** Event du bouton de l'état du jeu */
+    handleGame() {
+        this._game.setPlaying();
+        this._btnStartWaveElement.textContent = this._game.isPlaying ? 'Pause' : 'Lecture';
     }
 }

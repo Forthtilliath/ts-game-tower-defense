@@ -74,7 +74,7 @@ export default class Monster {
     /** Met en place le monstre sur la carte */
     public initialPosition() {
         if (!this._container) {
-            console.error(`%cErreur, le containeur pour les monstres n'a pas été trouvé !`, LogStyles.error);
+            console.error(`%cErreur, le containeur pour les monstres n'a pas été trouvé !`, LogStyles.danger);
             return;
         }
 
@@ -101,7 +101,7 @@ export default class Monster {
         this._element.style.setProperty('top', rect.y + 5 + 'px');
 
         if (this.isTargetReached(rect)) {
-            C.LOG_WAVE && console.log('Vague', this._wave.waveNumber, 'Disparition du monstre');
+            C.LOG_WAVE && console.log(`%cVague ${this._wave.waveNumber} Disparition du monstre`, LogStyles.success);
 
             this._wave.removeMonsterOfMap(this._element);
         }

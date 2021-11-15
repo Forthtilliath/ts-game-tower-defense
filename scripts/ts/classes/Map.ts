@@ -140,6 +140,7 @@ export default class Map {
     public nextWave() {
         this._currentWaveIndex++;
         this._currentWaves.push(this.createWave());
+        this._game.interface.setWave();
     }
 
     /** Génère une nouvelle vague à partir de l'index de la vague courante */

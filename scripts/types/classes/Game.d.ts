@@ -1,5 +1,6 @@
 import Interface from './Interface.js';
 import Json from './Json.js';
+import Map from './Map.js';
 /**
  * La class Game est la colonne vertébrale du jeu. Celle ci récupère les données
  * contenues dans le json et les propages dans toute l'application.
@@ -26,6 +27,7 @@ export default class Game {
     private constructor();
     get isPlaying(): boolean;
     get interface(): Interface;
+    get map(): Map;
     get json(): Json;
     get timestamp(): number;
     get delaiBetweenWaves(): number;

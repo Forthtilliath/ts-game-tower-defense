@@ -148,6 +148,7 @@ header .primary .link:hover {
   width: 100%;
   height: 100%;
   background-color: #ccc;
+  user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
